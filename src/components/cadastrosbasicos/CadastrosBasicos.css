@@ -1,0 +1,18 @@
+.cadboxmenu {
+    background-color: rgb(246, 242, 237);
+    margin: 0.10%;
+    padding: 1%;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    box-shadow: 5px 5px 5px #0004;
+}
+
+p {
+    font-weight: 600
+}
+
+h4 {
+    font-weight: 500
+}

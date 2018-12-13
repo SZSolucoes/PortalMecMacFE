@@ -1,0 +1,52 @@
+#manutmain {
+    margin: 0px;
+    display: grid;
+    grid-template-rows: max-content;
+    grid-template-columns: 40% auto;
+    grid-template-areas:
+        "manutmaincad manutmaintable"; 
+    background-color: rgb(255, 255, 255);
+    margin-bottom: 40vh;
+}
+
+#manutmaincad {
+    grid-area: manutmaincad;
+}
+
+#manutmaintable {
+    grid-area: manutmaintable;
+}
+
+.maindiv {
+    background-color: #FFF;
+    box-shadow: 0px 0px 15px #0004;
+}
+
+.divmanuttable{ 
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-left: 5px;
+    padding-right: 20px;
+}
+
+.manutencaotable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 41.8vh;
+    font-size: 90%;
+    margin-bottom: 20px;
+}
+
+.manutencaotabletools {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.manutencaodivtablebasic {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-left: 5px;
+    padding-right: 20px;
+}

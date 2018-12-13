@@ -1,0 +1,40 @@
+
+.trflex td {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.headerfilter {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    padding: 10px;
+}
+
+.fonttablemon {
+    font-size: 90%;
+}
+
+.cadbtn {
+    margin-right: auto;
+}
+
+.filterbtn {
+    margin-left: auto;
+}
+
+.vehicletabletools {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.veiculostable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 50vh;
+    font-size: 85%;
+    margin-bottom: 20px;
+}
+
