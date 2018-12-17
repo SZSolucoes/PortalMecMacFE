@@ -53,7 +53,7 @@ class ComplementosTabs extends React.Component {
         asyncfunExecGetManutencao();
 
         const asyncFunExec = async () => {
-            const dataTable = await doGetDataTableItemManutencao();
+            const dataTable = await doGetDataTableItemManutencao(this.props.item.id);
             if (dataTable && dataTable.success) {
                 store.dispatch({
                     type: 'modify_itemmanutencaocombo_manutencao',
@@ -66,7 +66,9 @@ class ComplementosTabs extends React.Component {
             }
         }
 
-        asyncFunExec();
+        if (this.props.item.id) {
+            asyncFunExec();
+        }
 
         // ###################################################################################
 
@@ -146,6 +148,12 @@ class ComplementosTabs extends React.Component {
 
         socket.on('table_itemmanutencao_changed', data => {
             if (data && data === 'true') {
+                asyncFunExec();
+            }
+        });
+
+        socket.on('table_itemmanutxvehicle_changed', data => {
+            if (data) {
                 asyncFunExec();
             }
         });

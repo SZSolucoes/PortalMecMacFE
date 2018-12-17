@@ -12,6 +12,7 @@ import ArosReducer from '../complementos/aros/ArosReducer';
 import ItemManutencaoReducer from '../cadastrosbasicos/itemmanutencao/ItemManutencaoReducer';
 import CBArosReducer from '../cadastrosbasicos/aros/CBArosReducer';
 import CPManualReducer from '../veiculos/cpmanual/CPManualReducer';
+import VincularReducer from '../cadastrosbasicos/itemmanutencao/vinculo/VincularReducer';
 
 export default combineReducers({
     VeiculosReducer,
@@ -22,6 +23,7 @@ export default combineReducers({
     ArosReducer,
     CBArosReducer,
     CPManualReducer,
+    VincularReducer,
     UtilsReducer,
     ManutencaoReducer,
     toastr: ToastrReducer,

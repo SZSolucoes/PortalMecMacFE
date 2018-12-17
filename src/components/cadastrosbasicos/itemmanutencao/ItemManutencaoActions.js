@@ -1,5 +1,6 @@
 import Axios from 'axios';
 import { toastr } from 'react-redux-toastr';
+import _ from 'lodash';
 
 import { BASEURL } from '../../utils/urls';
 
@@ -56,15 +57,91 @@ export const doDeleteItemManutencao = (id) => dispatch => {
     .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
 }
 
+export const doDeleteVincular = (params) => dispatch => {
+    Axios.delete(`${BASEURL}itemmanutxvehicle`, {
+        params
+    })
+    .then((res) => {
+        if (res && res.data) {
+            if (res.data.success === 'true') {
+                toastr.success('Sucesso', res.data.message);
+            } else {
+                toastr.error('Erro', res.data.message); 
+            }
+        }
+    })
+    .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
+}
+
+export const doPostVincCsvItens = (params) => dispatch => {
+    Axios.post(`${BASEURL}itemmanutxvehiclebatch`, params)
+    .then((res) => {
+        if (res && res.data) {
+            if (res.data.success === 'true') {
+                toastr.success('Sucesso', 'Inclusão realizada com sucesso.');
+            } else {
+                const lowerMsg = res.data.message.toLowerCase();
+                if (lowerMsg.indexOf('duplicate') !== -1) {
+                    toastr.error('Erro', 'Registro já existe.');
+                    return;
+                }
+                if (res.data.success === 'false') {
+                    toastr.error('Erro', 'Falha ao inserir registro.');
+                }
+            }
+        }
+    })
+    .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
+}
+
 export const doGetLastId = async () => {
     return Axios.get(`${BASEURL}itemmanutencaoid`)
             .then((res) => ({ success: true, data: res.data }))
             .catch(() => ({ success: false, data: [] }));
 }
 
-export const doGetDataTableItemManutencao = async () => {
-    return Axios.get(`${BASEURL}itemmanutencao`)
+export const doGetDataTableItemManutencao = async (id) => {
+    return Axios.get(`${BASEURL}itemmanutencao`, { params: { id } })
             .then((res) => ({ success: true, data: res.data }))
             .catch(() => ({ success: false, data: [] }));
 }
 
+
+export const doFetchVehicles = (params, vehicles) => async dispatch => {
+    const res = await Axios.get(`${BASEURL}itemmanutxvehicle`, { params });
+    if (res && res.data && res.data instanceof Array) {
+        let vFiltred = [];
+
+        vFiltred = _.filter(vehicles, (item) => {
+            for (let index = 0; index < res.data.length; index++) {
+                const element = res.data[index];
+                if (element.vehicleid === item.id) {
+                    return true;
+                }
+            }
+        });
+
+        vFiltred = _.map(vFiltred, item => {
+            for (let index = 0; index < res.data.length; index++) {
+                const element = res.data[index];
+                if (element.vehicleid === item.id) {
+                    return { ...item, id: element.id };
+                }
+            }
+
+            return item;
+        })
+
+        dispatch({
+            type: 'modify_datatablevehicles_itemmanutencao',
+            payload: vFiltred
+        });
+    } else if (!(res && res.data)) {
+        toastr.error('Erro', 'Falha de comunicação com o servidor.');
+    }
+
+    dispatch({
+        type: 'modify_veiculosloading_itemmanutencao',
+        payload: false
+    });
+}

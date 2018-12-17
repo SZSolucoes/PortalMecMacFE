@@ -3,13 +3,25 @@ import { connect } from 'react-redux';
 import { change } from 'redux-form';
 import Main from '../../templates/Main';
 import ItemManutencaoTable from './ItemManutencaoTable';
+import ItemManutencaoTableV from './ItemManutencaoTableV';
 import { socket } from '../../../main/App';
 import { store } from '../../../index';
 import { doGetDataTableItemManutencao } from './ItemManutencaoActions';
 
 import './ItemManutencao.css';
+import VincularModal from './vinculo/VincularModal';
 
 class ItemManutencao extends Component {
+    constructor(props) {
+        super(props);
+
+        this.setSuperState = this.setSuperState.bind(this);
+
+        this.state = {
+            selectedItemManutRowId: ''
+        }
+    }
+    
     componentDidMount() {
         const asyncFunExec = async () => {
             const dataTable = await doGetDataTableItemManutencao();
@@ -39,6 +51,13 @@ class ItemManutencao extends Component {
     componentWillUnmount() {
         socket.off('table_itemmanutencao_id');
         socket.off('table_itemmanutencao_changed');
+        store.dispatch({
+            type: 'modify_clean_itemmanutencao'
+        });
+    }
+
+    setSuperState(newState) {
+        this.setState({ ...newState });
     }
 
     render() {
@@ -49,18 +68,44 @@ class ItemManutencao extends Component {
                         Itens de Manutenção
                     </h2>
                     <hr />
-                    <div style={{ padding: 20 }}>
-                        <ItemManutencaoTable data={this.props.dataTableItemManutencao} />
+                    <div className='maintablesvincular'>
+                        <div style={{ flex: 0.8 }}>
+                            <Main>
+                                <h4>Itens</h4>
+                                <hr />
+                                <div style={{ paddingLeft: 20, paddingRight: 20 }}>
+                                    <ItemManutencaoTable
+                                        setSuperState={this.setSuperState}
+                                        data={this.props.dataTableItemManutencao} 
+                                    />
+                                </div>
+                            </Main>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <Main>
+                                <h4>Veículos</h4>
+                                <hr />
+                                <div style={{ paddingLeft: 20, paddingRight: 20 }}>
+                                    <ItemManutencaoTableV 
+                                        data={this.props.dataTableVehicles}
+                                        selectedItemManutRowId={this.state.selectedItemManutRowId}
+                                    />
+                                </div>
+                            </Main>
+
+                        </div>
                     </div>
                 </Main>
                 <div style={{ marginBottom: 50 }} />
+                <VincularModal />
             </div>
         );
     }
 }
 
 const mapStateToProps = (state) => ({
-    dataTableItemManutencao: state.ItemManutencaoReducer.dataTableItemManutencao
+    dataTableItemManutencao: state.ItemManutencaoReducer.dataTableItemManutencao,
+    dataTableVehicles: state.ItemManutencaoReducer.dataTableVehicles
 });
 
 export default connect(mapStateToProps, {

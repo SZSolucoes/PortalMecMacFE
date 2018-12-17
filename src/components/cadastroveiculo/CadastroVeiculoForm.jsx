@@ -124,7 +124,7 @@ class CadastroVeiculoForm extends React.Component {
                 if (todosValores.success && todosValores.data) {
                     if (todosValores.data.Valor) {
                         const constNewValue = parseFloat(todosValores.data.Valor
-                        .replace('R$', '').replace('.', '').replace(',', '.').trim());
+                        .replace('R$', '').replace(/\./g, '').replace(/,/g, '.').trim());
                         store.dispatch(change('cadastroveiculos', 'valor', constNewValue));
                     }
                     if (todosValores.data.Combustivel) {

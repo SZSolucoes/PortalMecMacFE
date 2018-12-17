@@ -52,6 +52,9 @@ class CBAros extends Component {
     componentWillUnmount() {
         socket.off('table_aros_id');
         socket.off('table_aros_changed');
+        store.dispatch({
+            type: 'modify_clean_cbaros'
+        });
     }
 
     setSuperState(newState) {

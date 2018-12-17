@@ -144,16 +144,20 @@ export const doFetchCBArosSubs = (params) => dispatch => {
             dispatch({
                 type: 'modify_datatablecbarossub_cbaros',
                 payload: res.data
-            })
-            if (res.data.length === 0) {
-                dispatch({
-                    type: 'modify_arossubloading_cbaros',
-                    payload: false
-                });
-            }
+            });
         }
+        dispatch({
+            type: 'modify_arossubloading_cbaros',
+            payload: false
+        });
     })
-    .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
+    .catch(() => { 
+        dispatch({
+            type: 'modify_arossubloading_cbaros',
+            payload: false
+        });
+        toastr.error('Erro', 'Falha de comunicação com o servidor.');
+    });
 }
 
 

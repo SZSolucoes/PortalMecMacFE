@@ -8,14 +8,16 @@ import { onMount, onUnmount } from 'react-keydown/es/event_handlers';
 import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
 //import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
+import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import CSVReader from 'react-csv-reader';
 import ReactDropzone from "react-dropzone";
 import Papa from 'papaparse';
 import _ from 'lodash';
 
 import ItemManutencaoTableModal from './ItemManutencaoTableModal';
+import { socket } from '../../../main/App';
 import { store } from '../../../index';
-import { doGetLastId } from './ItemManutencaoActions';
+import { doGetLastId, doFetchVehicles } from './ItemManutencaoActions';
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../utils/UtilsActions';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css"
 
@@ -29,8 +31,11 @@ class ItemManutencaoTable extends Component {
         this.onClickIncluir = this.onClickIncluir.bind(this);
         this.onClickRemover = this.onClickRemover.bind(this);
         this.onClickImportCsv = this.onClickImportCsv.bind(this);
+        this.onClickDropDownBtn = this.onClickDropDownBtn.bind(this);
+        this.onClickVincular = this.onClickVincular.bind(this);
         this.handleCsvFile = this.handleCsvFile.bind(this);
         this.handleCsvFileError = this.handleCsvFileError.bind(this);
+        this.renderDropDownButton = this.renderDropDownButton.bind(this);
 
         //this.importCsvItemManut = React.createRef();
 
@@ -42,17 +47,44 @@ class ItemManutencaoTable extends Component {
                 hideSelectColumn: true,
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
-                selected: ['']
-            }
+                selected: [''],
+                selectedRow: {}
+            },
+            dropdownBtnOpen: false
         }
     }
 
     componentDidMount() {
         onMount(this);
+
+        socket.on('table_itemmanutxvehicle_changed', data => {
+            if ((typeof data === 'number' || typeof data === 'string') && 
+                this.state.selectRow.selected[0].toString() === data.toString()
+            ) {
+                this.props.doFetchVehicles({ itemmanutid: data }, [  
+                    ...this.props.listCarros,
+                    ...this.props.listCaminhoes,
+                    ...this.props.listMotos,     
+                ]);
+            }
+        });
+    }
+    
+    componentDidUpdate() {
+        const { data } = this.props;
+
+        if( !data || data.length === 0) {
+            store.dispatch({
+                type: 'modify_datatablevehicles_itemmanutencao',
+                payload: []
+            });
+        }
     }
 
     componentWillUnmount() {
         onUnmount(this);
+
+        socket.off('table_itemmanutxvehicle_changed');
     }
 
     onKeyUpOrDown(event) {
@@ -110,7 +142,7 @@ class ItemManutencaoTable extends Component {
                             item: data, 
                             action: 'incluibatch_itemmanutencaotable' 
                         });
-                        this.itemManutencaotableBtnConfirmModalRef.click();
+                        this.itemManutConfirmModal.click();
                     } else {
                         toastr.error('Erro', 'Falha na importação.');
                     }
@@ -146,7 +178,7 @@ class ItemManutencaoTable extends Component {
                 item: { id: this.state.selectRow.selected[0] }, 
                 action: 'remove_itemmanutencaotable' 
             });
-            this.itemManutencaotableBtnConfirmModalRef.click();
+            this.itemManutConfirmModal.click();
         }
     }
 
@@ -154,6 +186,22 @@ class ItemManutencaoTable extends Component {
         this.importCsvItemManutRef.firstChild.firstChild.accept = '.txt,.csv';
         this.importCsvItemManutRef.firstChild.firstChild.value = '';
         this.importCsvItemManutRef.firstChild.firstChild.click();
+    }
+
+    onClickDropDownBtn() {
+        this.setState({
+            dropdownBtnOpen: !this.state.dropdownBtnOpen
+        });
+    }
+
+    onClickVincular() {
+        if (this.state.selectRow.selected[0]) {
+            store.dispatch({
+                type: 'modify_item_vincularitemmanut',
+                payload: this.state.selectRow.selected[0]
+            });
+            this.selectVehicleModal.click();
+        }
     }
 
     handleCsvFile(data, name) {
@@ -183,7 +231,7 @@ class ItemManutencaoTable extends Component {
                 item: newData, 
                 action: 'incluibatch_itemmanutencaotable' 
             });
-            this.itemManutencaotableBtnConfirmModalRef.click();
+            this.itemManutConfirmModal.click();
         } else {
             toastr.error('Erro', 'Falha na importação.');
         }
@@ -194,11 +242,59 @@ class ItemManutencaoTable extends Component {
     }
 
     handleOnSelect(row, isSelect, rowIndex, e) {
+        store.dispatch({
+            type: 'modify_datatablevehicles_itemmanutencao',
+            payload: []
+        });
+        
         if (isSelect) {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [row.id] } });
+            this.setState({ selectRow: { ...this.state.selectRow, selected: [row.id], selectedRow: row } });
+            this.props.setSuperState({ selectedItemManutRowId: row.id });
+            store.dispatch({
+                type: 'modify_veiculosloading_itemmanutencao',
+                payload: true
+            });
+            
+            this.props.doFetchVehicles({ itemmanutid: row.id }, [  
+                ...this.props.listCarros,
+                ...this.props.listCaminhoes,
+                ...this.props.listMotos,     
+            ]);
         } else {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [''] } });
+            this.setState({ selectRow: { ...this.state.selectRow, selected: [''], selectedRow: {} } });
+            this.props.setSuperState({ selectedItemManutRowId: '' });
+            store.dispatch({
+                type: 'modify_veiculosloading_itemmanutencao',
+                payload: false
+            });
         }
+    }
+
+    renderDropDownButton(csvProps) {
+        return (
+            <ButtonDropdown isOpen={this.state.dropdownBtnOpen} toggle={this.onClickDropDownBtn}>
+                <DropdownToggle caret>
+                    Mais
+                </DropdownToggle>
+                <DropdownMenu>
+                    <DropdownItem
+                        onClick={() => {
+                            this.importCsvDivRef.firstChild.firstChild.accept = '.txt,.csv';
+                            this.importCsvDivRef.firstChild.firstChild.value = '';
+                            this.importCsvDivRef.firstChild.firstChild.click();
+                        }}
+                    >
+                        Importar CSV
+                    </DropdownItem>
+                    <DropdownItem divider />
+                    <DropdownItem
+                        onClick={() => this.exportCsvDivRef.firstChild.click()}
+                    >
+                        Exportar CSV
+                    </DropdownItem>
+                </DropdownMenu>
+            </ButtonDropdown>
+        );
     }
 
     render() {
@@ -275,24 +371,30 @@ class ItemManutencaoTable extends Component {
                                                             Remover
                                                         </button>
                                                         <button
-                                                            ref={ref => (this.itemManutencaotableBtnConfirmModalRef = ref)}
+                                                            ref={ref => (this.itemManutConfirmModal = ref)}
                                                             hidden
                                                             data-toggle="modal" data-target="#confirmmodal"
                                                             data-backdrop="static" data-keyboard="false"
                                                         />
                                                         <button 
-                                                            className="btn btn-success"
-                                                            onClick={() => this.onClickImportCsv()}
-                                                            style={{ marginRight: 10 }}
+                                                            className="btn btn-warning"
+                                                            onClick={() => this.onClickVincular()}
+                                                            style={{ marginRight: 10, color: 'white' }}
                                                         >
-                                                            Importar CSV
+                                                            Vincular
                                                         </button>
-                                                        <div
-                                                            ref={ref => (this.importCsvItemManutRef = ref)}
+                                                        <button
+                                                            ref={ref => (this.selectVehicleModal = ref)}
+                                                            hidden
+                                                            data-toggle="modal" data-target="#vincularitemmanut"
+                                                            data-backdrop="static" data-keyboard="false"
+                                                        />
+                                                        <div 
+                                                            ref={ref => (this.importCsvDivRef = ref)}
                                                             hidden
                                                         >
                                                             <CSVReader
-                                                                inputId='importCsvItemManut'
+                                                                inputId='importCsvAros'
                                                                 onFileLoaded={this.handleCsvFile}
                                                                 onError={this.handleCsvFileError}
                                                                 parserOptions={{
@@ -301,9 +403,15 @@ class ItemManutencaoTable extends Component {
                                                                 }}
                                                             />
                                                         </div>
-                                                        <CSVExport.ExportCSVButton { ...props.csvProps }>
-                                                            Exportar CSV
-                                                        </CSVExport.ExportCSVButton>
+                                                        <div 
+                                                            ref={ref => (this.exportCsvDivRef = ref)}
+                                                            hidden
+                                                        >
+                                                            <CSVExport.ExportCSVButton { ...props.csvProps } hidden>
+                                                                Exportar CSV
+                                                            </CSVExport.ExportCSVButton>
+                                                        </div>
+                                                        {this.renderDropDownButton()}
                                                     </div>
                                                     <div style={{ flex: 1 }}>
                                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
@@ -336,7 +444,10 @@ class ItemManutencaoTable extends Component {
     }
 }
 
-const mapStateToProps = () => ({
+const mapStateToProps = (state) => ({
+    listCarros: state.VeiculosReducer.listCarros,
+    listMotos: state.VeiculosReducer.listMotos,
+    listCaminhoes: state.VeiculosReducer.listCaminhoes
 });
 
 setBinding({
@@ -348,6 +459,7 @@ setBinding({
 export default connect(mapStateToProps, {
     modifyModalTitle, 
     modifyModalMessage, 
-    modifyExtraData
+    modifyExtraData,
+    doFetchVehicles
 })(ItemManutencaoTable);
 

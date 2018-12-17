@@ -14,7 +14,7 @@ export const checkFilterCarros = (item, newFilter) => {
 
     const bValor = newFilter.valor ? 
     item.valor.toLocaleString(undefined , { minimumFractionDigits: 2 })
-    .replace('.', '').replace(',', '').startsWith(
+    .replace(/\./g, '').replace(/,/g, '').startsWith(
         newFilter.valor
     ) : true;
 
