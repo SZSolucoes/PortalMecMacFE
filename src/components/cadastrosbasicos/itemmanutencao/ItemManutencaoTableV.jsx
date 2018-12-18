@@ -139,7 +139,11 @@ class ItemManutencaoTableV extends Component {
             )
             .then(
                 (results) => {
-                    let data = results.map(rows => rows.data);
+                    let data = results.map(
+                        rows => rows.data.map(
+                            val => val.filter(
+                                val2 => (val2 || (typeof val2 === 'number' && val2 === 0)
+                    ))));
                     
                     data = [].concat.apply([], data);
                     data = _.filter(data, row => {
@@ -232,7 +236,12 @@ class ItemManutencaoTableV extends Component {
             return;
         }
 
-        let newData = _.filter(data, row => {
+        let newData = data.map(
+            val => val.filter(
+                 val2 => (val2 || (typeof val2 === 'number' && val2 === 0)
+        )));
+
+        newData = _.filter(newData, row => {
             if (row.length < 3) {
                 return false;
             }

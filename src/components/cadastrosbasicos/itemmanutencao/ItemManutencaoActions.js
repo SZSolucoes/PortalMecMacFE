@@ -78,7 +78,15 @@ export const doPostVincCsvItens = (params) => dispatch => {
     .then((res) => {
         if (res && res.data) {
             if (res.data.success === 'true') {
-                toastr.success('Sucesso', 'Inclusão realizada com sucesso.');
+                if (res.data.message && res.data.message instanceof Array && res.data.message.length) {
+                    let veiculos = '';
+                    res.data.message.forEach(element => {
+                        veiculos += `${element}\n`;
+                    });
+                    alert('Os veículos a seguir não foram importados devido a não possuirem cadastro.\n' + veiculos)
+                } else {
+                    toastr.success('Sucesso', 'Inclusão efetuada com sucesso.');
+                }
             } else {
                 const lowerMsg = res.data.message.toLowerCase();
                 if (lowerMsg.indexOf('duplicate') !== -1) {

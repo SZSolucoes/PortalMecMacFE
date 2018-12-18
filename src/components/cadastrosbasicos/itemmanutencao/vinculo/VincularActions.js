@@ -14,19 +14,27 @@ export const doConfirmVincular = (params, btnCloseModal) => async dispatch => {
     });
 
     await Axios.post(`${BASEURL}itemmanutxvehicle`, params)
-            .then((res) => {
-                if (res && res.data) {
-                    if (res.data.success === 'true') {
-                        btnCloseModal.click();
-                        setTimeout(() => toastr.success('Sucesso', res.data.message), 500);
-                        return true;
-                    } else {
-                        toastr.error('Erro', res.data.message);
-                        return false;
-                    }
+        .then((res) => {
+            if (res && res.data) {
+                if (res.data.success === 'true') {
+                    dispatch({
+                        type: 'modify_overlaymodal_vincularitemmanut',
+                        payload: false
+                    });
+                    setTimeout(() => btnCloseModal.click(), 500);
+                    setTimeout(() => toastr.success('Sucesso', res.data.message), 1000);
+                    return true;
+                } else {
+                    dispatch({
+                        type: 'modify_overlaymodal_vincularitemmanut',
+                        payload: false
+                    });
+                    toastr.error('Erro', res.data.message);
+                    return false;
                 }
-            })
-            .catch(() => false);
+            }
+        })
+        .catch(() => false);
     dispatch({
         type: 'modify_overlaymodal_vincularitemmanut',
         payload: false

@@ -42,6 +42,10 @@ class CadastroVeiculoForm extends React.Component {
         this.consultarFipe = this.consultarFipe.bind(this);
         this.hideModal = this.hideModal.bind(this);
         this.resetFields = this.resetFields.bind(this);
+
+        this.state = {
+            lockCombos: false
+        }
     }
 
     onSubmitVeiculoForm(values) {
@@ -156,6 +160,7 @@ class CadastroVeiculoForm extends React.Component {
     }
 
     consultarFipe(event, field) {
+        this.setState({ lockCombos: true });
         const state = store.getState();
         switch (field) {
             case 'fipeperiodoref':
@@ -224,14 +229,22 @@ class CadastroVeiculoForm extends React.Component {
 
             default:
         }
+        setTimeout(() => this.setState({ lockCombos: false }), 1000);
     }
 
     hideModal(item) {
-        this.confirmCadVeiculoBtnRef.click();
-        store.dispatch(reset('cadastroveiculos'));
+        //this.confirmCadVeiculoBtnRef.click();
+        //store.dispatch(reset('cadastroveiculos'));
 
-        this.props.modifyComplementosItem(item);
-        this.props.history.push('/complementos');
+        store.dispatch(change('cadastroveiculos', 'fipemesano', ''));
+        store.dispatch(change('cadastroveiculos', 'marca', ''));
+        store.dispatch(change('cadastroveiculos', 'modelo', ''));
+        store.dispatch(change('cadastroveiculos', 'ano', ''));
+        store.dispatch(change('cadastroveiculos', 'valor', ''));
+        store.dispatch(change('cadastroveiculos', 'combustivel', ''));
+
+        //this.props.modifyComplementosItem(item);
+        //this.props.history.push('/complementos');
     }
 
     resetFields(reset) {
@@ -313,6 +326,7 @@ class CadastroVeiculoForm extends React.Component {
                                         className="form-control" 
                                         name="fipeperiodoref"
                                         onChange={event => this.consultarFipe(event, 'fipeperiodoref')}
+                                        disabled={this.state.lockCombos}
                                     >
                                         {this.renderFipeRefOptions()}
                                     </Field>
@@ -326,6 +340,7 @@ class CadastroVeiculoForm extends React.Component {
                                         className="form-control" 
                                         name="fipemarca"
                                         onChange={event => this.consultarFipe(event, 'fipemarca')}
+                                        disabled={this.state.lockCombos}
                                     >
                                         {this.renderFipeMarcaOptions()}
                                     </Field>
@@ -339,6 +354,7 @@ class CadastroVeiculoForm extends React.Component {
                                         className="form-control" 
                                         name="fipemodelo"
                                         onChange={event => this.consultarFipe(event, 'fipemodelo')}
+                                        disabled={this.state.lockCombos}
                                     >
                                         {this.renderFipeModeloOptions()}
                                     </Field>
@@ -351,6 +367,7 @@ class CadastroVeiculoForm extends React.Component {
                                         component="select" 
                                         className="form-control" 
                                         name="fipeano"
+                                        disabled={this.state.lockCombos}
                                     >
                                         {this.renderFipeAnoOptions()}
                                     </Field>
@@ -363,6 +380,7 @@ class CadastroVeiculoForm extends React.Component {
                                     className="btn btn-primary"
                                     type="button"
                                     onClick={() => this.onClickCarregar()}
+                                    disabled={this.state.lockCombos}
                                 >
                                     Carregar
                                 </button>
