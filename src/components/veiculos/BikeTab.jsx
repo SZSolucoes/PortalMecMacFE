@@ -14,6 +14,7 @@ import { modifyComplementosItem } from '../complementos/ComplementosActions';
 import { modifyCPManualItem } from './cpmanual/CPManualActions';
 
 import './VeiculosTabs.css';
+import { store } from '../..';
 
 class BikeTab extends React.Component {
 
@@ -24,6 +25,7 @@ class BikeTab extends React.Component {
         this.onClickComplementos = this.onClickComplementos.bind(this);
         this.onClickRemover = this.onClickRemover.bind(this);
         this.onClickCPManual = this.onClickCPManual.bind(this);
+        this.onClickModify = this.onClickModify.bind(this);
 
         this.state = {
             selectRow: {
@@ -34,9 +36,34 @@ class BikeTab extends React.Component {
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
                 selected: [''],
-                selectedRow: {}
+                selectedRow: {},
+                selectedIndex: -1
             }
         };
+    }
+
+    componentDidUpdate() {
+        const { selectedIndex, selectedRow } = this.state.selectRow;
+        let newSelectedRow = selectedRow;
+
+        if (selectedIndex > -1 && (this.props.listMotos.length - 1) >= selectedIndex) {
+            newSelectedRow = { ...this.props.listMotos[selectedIndex] };
+        }
+
+        if (this.props.isRefreshTabBike) {
+            store.dispatch({
+                type: 'modify_isrefreshtabbike_veiculos',
+                payload: false
+            });
+
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [newSelectedRow.id], 
+                    selectedRow: newSelectedRow
+                } 
+            });
+        }
     }
 
     onClickComplementos() {
@@ -77,11 +104,37 @@ class BikeTab extends React.Component {
         }
     }
 
+    onClickModify() {
+        if (this.state.selectRow.selected[0]) {
+            this.props.doOpenVeiculoModal(
+                '2', 
+                '2', 
+                this.state.selectRow.selected[0],
+                this.state.selectRow.selectedRow
+            );
+            this.incluirBikeRef.click();
+        }
+    }
+
     handleOnSelect(row, isSelect, rowIndex, e) {
         if (isSelect) {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [row.id], selectedRow: row } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [row.id], 
+                    selectedRow: row,
+                    selectedIndex: rowIndex
+                } 
+            });
         } else {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [''], selectedRow: {} } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [''], 
+                    selectedRow: {},
+                    selectedIndex: -1 
+                }
+            });
         }
     }
 
@@ -195,6 +248,15 @@ class BikeTab extends React.Component {
                                         >
                                             Cadastrar
                                         </button>
+                                        <button 
+                                            className="btn btn-dark cadbtn"
+                                            style={{ marginRight: 10 }}
+                                            onClick={() => { 
+                                                this.onClickModify();
+                                            }}
+                                        >
+                                            Modificar
+                                        </button>
                                         <button
                                             ref={ref => (this.incluirBikeRef = ref)}
                                             hidden
@@ -263,7 +325,8 @@ class BikeTab extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    listMotos: state.VeiculosReducer.listMotos
+    listMotos: state.VeiculosReducer.listMotos,
+    isRefreshTabBike: state.VeiculosReducer.isRefreshTabBike
 });
 
 export default withRouter(connect(mapStateToProps, {

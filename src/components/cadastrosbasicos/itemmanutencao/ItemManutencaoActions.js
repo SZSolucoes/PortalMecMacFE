@@ -116,36 +116,45 @@ export const doGetDataTableItemManutencao = async (id) => {
 
 
 export const doFetchVehicles = (params, vehicles) => async dispatch => {
-    const res = await Axios.get(`${BASEURL}itemmanutxvehicle`, { params });
-    if (res && res.data && res.data instanceof Array) {
-        let vFiltred = [];
-
-        vFiltred = _.filter(vehicles, (item) => {
-            for (let index = 0; index < res.data.length; index++) {
-                const element = res.data[index];
-                if (element.vehicleid === item.id) {
-                    return true;
+    try {
+        const res = await Axios.get(`${BASEURL}itemmanutxvehicle`, { params });
+        if (res && res.data && res.data instanceof Array) {
+            let vFiltred = [];
+    
+            vFiltred = _.filter(vehicles, (item) => {
+                for (let index = 0; index < res.data.length; index++) {
+                    const element = res.data[index];
+                    if (element.vehicleid === item.id) {
+                        return true;
+                    }
                 }
-            }
-        });
-
-        vFiltred = _.map(vFiltred, item => {
-            for (let index = 0; index < res.data.length; index++) {
-                const element = res.data[index];
-                if (element.vehicleid === item.id) {
-                    return { ...item, id: element.id };
+            });
+    
+            vFiltred = _.map(vFiltred, item => {
+                for (let index = 0; index < res.data.length; index++) {
+                    const element = res.data[index];
+                    if (element.vehicleid === item.id) {
+                        return { ...item, id: element.id };
+                    }
                 }
-            }
-
-            return item;
-        })
-
+    
+                return item;
+            })
+    
+            dispatch({
+                type: 'modify_datatablevehicles_itemmanutencao',
+                payload: vFiltred
+            });
+        } else if (!(res && res.data)) {
+            toastr.error('Erro', 'Falha de comunicação com o servidor.');
+        }
+    } catch (e) {
         dispatch({
-            type: 'modify_datatablevehicles_itemmanutencao',
-            payload: vFiltred
+            type: 'modify_veiculosloading_itemmanutencao',
+            payload: false
         });
-    } else if (!(res && res.data)) {
-        toastr.error('Erro', 'Falha de comunicação com o servidor.');
+
+        return;
     }
 
     dispatch({

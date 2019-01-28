@@ -6,7 +6,15 @@ const INITIAL_STATE = {
     fipeTabRef: [],
     fipeMarcas: [],
     fipeModelos: [],
-    fipeAnos: []
+    fipeAnos: [],
+    formValues: {
+        fipeperiodoref: '',
+        marca: '',
+        modelo: '',
+        ano: '',
+        valor: '',
+        combustivel: ''
+    }
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -46,16 +54,22 @@ export default (state = INITIAL_STATE, action) => {
                 ...state,
                 fipeAnos: [...action.payload]
             };
+        case 'modify_formvalues_cadastroveiculo':
+            return {
+                ...state,
+                formValues: { ...action.payload }
+            };
         case 'modify_clean_utils':
             return {
                 ...state,
                 idVeiculo: '',
                 formType: '',
                 formVeiculoType: '',
-                fipeTabRef: [],
+                fipeTabRef: {},
                 fipeMarcas: [],
                 fipeModelos: [],
-                fipeAnos: []
+                fipeAnos: [],
+                formValues: {}
             };
         default:
             return state;

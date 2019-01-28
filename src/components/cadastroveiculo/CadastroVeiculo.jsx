@@ -22,11 +22,20 @@ class CadastroVeiculo extends Component {
     }
 
     getModalTitle() {
-        switch(this.props.formVeiculoType) {
-            case '1': return 'Cadastro de Carros'
-            case '2': return 'Cadastro de Motos'
-            case '3': return 'Cadastro de Caminhões'
-            default: return ''
+        if (this.props.formType === '2') {
+            switch(this.props.formVeiculoType) {
+                case '1': return 'Modificar - Carro'
+                case '2': return 'Modificar - Moto'
+                case '3': return 'Modificar - Caminhão'
+                default: return ''
+            }
+        } else {
+            switch(this.props.formVeiculoType) {
+                case '1': return 'Cadastro de Carros'
+                case '2': return 'Cadastro de Motos'
+                case '3': return 'Cadastro de Caminhões'
+                default: return ''
+            }
         }
     }
 
@@ -73,6 +82,7 @@ class CadastroVeiculo extends Component {
 }
 
 const mapStateToProps = (state) => ({
+    formType: state.CadastroVeiculoReducer.formType,
     formVeiculoType: state.CadastroVeiculoReducer.formVeiculoType
 });
 

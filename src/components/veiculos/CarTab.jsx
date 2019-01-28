@@ -14,6 +14,7 @@ import { modifyComplementosItem } from '../complementos/ComplementosActions';
 import { modifyCPManualItem } from './cpmanual/CPManualActions';
 
 import './VeiculosTabs.css';
+import { store } from '../..';
 
 class CarTab extends React.Component {
 
@@ -24,6 +25,7 @@ class CarTab extends React.Component {
         this.onClickComplementos = this.onClickComplementos.bind(this);
         this.onClickRemover = this.onClickRemover.bind(this);
         this.onClickCPManual = this.onClickCPManual.bind(this);
+        this.onClickModify = this.onClickModify.bind(this);
 
         this.state = {
             selectRow: {
@@ -34,9 +36,36 @@ class CarTab extends React.Component {
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
                 selected: [''],
-                selectedRow: {}
+                selectedRow: {},
+                selectedIndex: -1
             }
         };
+    }
+
+    componentDidUpdate() {
+        const { selectedIndex, selectedRow } = this.state.selectRow;
+        let newSelectedRow = selectedRow;
+
+        if (selectedIndex > -1 && (this.props.listCarros.length - 1) >= selectedIndex) {
+            newSelectedRow = { ...this.props.listCarros[selectedIndex] };
+        }
+
+        if (this.props.isRefreshTabCar) {
+            store.dispatch({
+                type: 'modify_isrefreshtabcar_veiculos',
+                payload: false
+            });
+
+            console.log(newSelectedRow);
+            
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [newSelectedRow.id], 
+                    selectedRow: newSelectedRow
+                } 
+            });
+        }
     }
 
     onClickComplementos() {
@@ -77,11 +106,37 @@ class CarTab extends React.Component {
         }
     }
 
+    onClickModify() {
+        if (this.state.selectRow.selected[0]) {
+            this.props.doOpenVeiculoModal(
+                '2', 
+                '1', 
+                this.state.selectRow.selected[0],
+                this.state.selectRow.selectedRow
+            );
+            this.incluirCarRef.click();
+        }
+    }
+
     handleOnSelect(row, isSelect, rowIndex, e) {
         if (isSelect) {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [row.id], selectedRow: row } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [row.id], 
+                    selectedRow: row,
+                    selectedIndex: rowIndex
+                } 
+            });
         } else {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [''], selectedRow: {} } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [''], 
+                    selectedRow: {},
+                    selectedIndex: -1 
+                }
+            });
         }
     }
 
@@ -195,6 +250,15 @@ class CarTab extends React.Component {
                                         >
                                             Cadastrar
                                         </button>
+                                        <button 
+                                            className="btn btn-dark cadbtn"
+                                            style={{ marginRight: 10 }}
+                                            onClick={() => { 
+                                                this.onClickModify();
+                                            }}
+                                        >
+                                            Modificar
+                                        </button>
                                         <button
                                             ref={ref => (this.incluirCarRef = ref)}
                                             hidden
@@ -267,7 +331,8 @@ class CarTab extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    listCarros: state.VeiculosReducer.listCarros
+    listCarros: state.VeiculosReducer.listCarros,
+    isRefreshTabCar: state.VeiculosReducer.isRefreshTabCar
 });
 
 export default withRouter(connect(mapStateToProps, {

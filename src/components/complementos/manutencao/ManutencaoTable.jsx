@@ -136,10 +136,23 @@ class ManutencaoTable extends Component {
                                         >
                                             Remover
                                         </button>
+                                        <button 
+                                            className="btn btn-dark"
+                                            onClick={() => this.manutMdfItemModalRef.click()}
+                                            style={{ marginRight: 10 }}
+                                        >
+                                            Modificar
+                                        </button>
                                         <button
                                             ref={ref => (this.manutencaotableBtnConfirmModalRef = ref)}
                                             hidden
                                             data-toggle="modal" data-target="#confirmmodal"
+                                            data-backdrop="static" data-keyboard="false"
+                                        />
+                                        <button
+                                            ref={ref => (this.manutMdfItemModalRef = ref)}
+                                            hidden
+                                            data-toggle="modal" data-target="#manutmdfitem"
                                             data-backdrop="static" data-keyboard="false"
                                         />
                                         <CSVExport.ExportCSVButton { ...props.csvProps }>

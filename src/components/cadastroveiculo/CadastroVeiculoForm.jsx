@@ -73,7 +73,8 @@ class CadastroVeiculoForm extends React.Component {
 
         if (this.props.formType === '2') {
             newValues.id = this.props.idVeiculo;
-            this.props.doPutVeiculo(newValues, '', this.hideModal);
+            newValues.newId = newId;
+            this.props.doPutVeiculo(newValues, () => this.closeBtn);
         } else {
             this.props.doPostVeiculo(newValues, this.hideModal);
         }
@@ -249,7 +250,9 @@ class CadastroVeiculoForm extends React.Component {
 
     resetFields(reset) {
         const {
-            fipeTabRef
+            fipeTabRef,
+            formType,
+            formValues
         } = this.props;
 
         let fipePeriodoRefValue = '';
@@ -259,6 +262,15 @@ class CadastroVeiculoForm extends React.Component {
         }
 
         reset();
+
+        if (formType === '2') {
+            store.dispatch(change('cadastroveiculos', 'fipemesano', formValues.fipeperiodoref));
+            store.dispatch(change('cadastroveiculos', 'marca', formValues.marca));
+            store.dispatch(change('cadastroveiculos', 'modelo', formValues.modelo));
+            store.dispatch(change('cadastroveiculos', 'ano', formValues.ano));
+            store.dispatch(change('cadastroveiculos', 'valor', formValues.valor));
+            store.dispatch(change('cadastroveiculos', 'combustivel', formValues.combustivel));
+        }
 
         setTimeout(() => {
             store.dispatch(change('cadastroveiculos', 'fipeperiodoref', fipePeriodoRefValue));
@@ -311,7 +323,7 @@ class CadastroVeiculoForm extends React.Component {
     } 
 
     render() {
-        const { handleSubmit, pristine, reset, submitting } = this.props
+        const { handleSubmit, pristine, reset, submitting } = this.props;
         return (
             <form onSubmit={handleSubmit(this.onSubmitVeiculoForm)}>
                 <div className="form">
@@ -488,11 +500,12 @@ class CadastroVeiculoForm extends React.Component {
                                     disabled={pristine || submitting}
                                     onClick={() => this.resetFields(reset)}
                                 >
-                                    Limpar
+                                    {this.props.formType === '2' ? 'Restaurar' : 'Limpar'}
                                 </button>
                                 <button 
                                     type="button" 
                                     className="btn btn-secondary"
+                                    ref={ref => (this.closeBtn = ref)}
                                     onClick={() => reset()} 
                                     data-dismiss="modal">
                                     Fechar
@@ -506,15 +519,10 @@ class CadastroVeiculoForm extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    idProp: state.CadastroVeiculoReducer.idProp,
-    formType: state.CadastroVeiculoReducer.formType,
-    formVeiculoType: state.CadastroVeiculoReducer.formVeiculoType,
-    fipeTabRef: state.CadastroVeiculoReducer.fipeTabRef,
-    fipeMarcas: state.CadastroVeiculoReducer.fipeMarcas,
-    fipeModelos: state.CadastroVeiculoReducer.fipeModelos,
-    fipeAnos: state.CadastroVeiculoReducer.fipeAnos,
-    initialValues: {
+const mapStateToProps = (state) => {
+    const formValues = state.CadastroVeiculoReducer.formValues;
+    const formType = state.CadastroVeiculoReducer.formType;
+    const initialValues = {
         fipeperiodoref: '',
         fipemarca: '',
         fipemodelo: '',
@@ -525,8 +533,20 @@ const mapStateToProps = (state) => ({
         ano: '',
         valor: '',
         combustivel: ''
-    }
-});
+    };
+
+    return ({
+        formType,
+        formValues,
+        formVeiculoType: state.CadastroVeiculoReducer.formVeiculoType,
+        idVeiculo: state.CadastroVeiculoReducer.idVeiculo,
+        fipeTabRef: state.CadastroVeiculoReducer.fipeTabRef,
+        fipeMarcas: state.CadastroVeiculoReducer.fipeMarcas,
+        fipeModelos: state.CadastroVeiculoReducer.fipeModelos,
+        fipeAnos: state.CadastroVeiculoReducer.fipeAnos,
+        initialValues
+    });
+};
 
 CadastroVeiculoForm = reduxForm({
     form: 'cadastroveiculos',

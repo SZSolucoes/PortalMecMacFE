@@ -9,12 +9,24 @@ import { consultarMarcas, consultarModelos, consultarAnoModelo } from '../utils/
 import { doFetchVehicle } from '../utils/UtilsActions';
 import { store } from '../../index';
 
-export const doOpenVeiculoModal = (formType, veiculoType, idVeiculo, formValues) => dispatch => {
+export const doOpenVeiculoModal = (
+    formType = '1', 
+    veiculoType, 
+    idVeiculo = '-1', 
+    formValues = {
+        fipeperiodoref: '',
+        marca: '',
+        modelo: '',
+        ano: '',
+        valor: '',
+        combustivel: ''
+    }
+) => dispatch => {
     const veiculo = veiculoType || '1';
     const fipeTabRef = store.getState().CadastroVeiculoReducer.fipeTabRef;
     dispatch({
         type: 'modify_formtype_cadastroveiculo',
-        payload: formType || '1'
+        payload: formType
     });
     dispatch({
         type: 'modify_formveiculotype_cadastroveiculo',
@@ -22,8 +34,21 @@ export const doOpenVeiculoModal = (formType, veiculoType, idVeiculo, formValues)
     });
     dispatch({
         type: 'modify_idveiculo_cadastroveiculo',
-        payload: idVeiculo || '-1'
+        payload: idVeiculo
     });
+    dispatch({
+        type: 'modify_formvalues_cadastroveiculo',
+        payload: formValues
+    });
+
+    if (formType === '2') {
+        store.dispatch(change('cadastroveiculos', 'fipemesano', formValues.fipeperiodoref));
+        store.dispatch(change('cadastroveiculos', 'marca', formValues.marca));
+        store.dispatch(change('cadastroveiculos', 'modelo', formValues.modelo));
+        store.dispatch(change('cadastroveiculos', 'ano', formValues.ano));
+        store.dispatch(change('cadastroveiculos', 'valor', formValues.valor));
+        store.dispatch(change('cadastroveiculos', 'combustivel', formValues.combustivel));
+    }
 
     if (fipeTabRef && fipeTabRef.length > 0) {
         const funExec = async () => {
@@ -148,44 +173,30 @@ const onFetchError = (e) => {
 
 };
 
-export const doPutVeiculo = (params, type='', funCleanModal) => dispatch => {
-    Axios.put(`${BASEURL}propostas`, params)
-        .then(res => onPutVeiculoSuccess(dispatch, res, type, funCleanModal, params))
+export const doPutVeiculo = (params, funCleanCloseModal) => dispatch => {
+    Axios.put(`${BASEURL}veiculos`, params)
+        .then(res => onPutVeiculoSuccess(dispatch, res, params, funCleanCloseModal))
         .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'));
 };
 
-const onPutVeiculoSuccess = (dispatch, res, type, funCleanModal, params) => {
+const onPutVeiculoSuccess = (dispatch, res, params, funCleanCloseModal) => {
     if (res && res.data) {
         if (res.data.success === 'true') {
-            Axios.get(`${BASEURL}propostas`
-            )
-                .then(res => onFetchSuccess(dispatch, res, type))
-                .catch((e) => onFetchError(e));
-            if (type === 'finish') {
-                toastr.success('Sucesso', 'Finalização realizada com sucesso.');
-            } else {
-                toastr.success('Sucesso', 'Alteração realizada com sucesso.');
-            }
-
-            funCleanModal(params);
-
-            dispatch(reset('cadastroprop'));
-            dispatch({ 
-                type: 'modify_formproptype_cadastroprop',
-                payload: ''
-            });
+            toastr.success('Sucesso', 'Cadastro realizado com sucesso.');
+            
+            funCleanCloseModal().click();
+            
+            refreshVehicle(params.vehicletype, params);
         } else {
-            if (type === 'finish') {
-                toastr.success('Sucesso', 'Falha ao finaliza a proposta.');
-            } else {
-                toastr.error('Erro', 'Falha ao alterar a proposta.');
+            const lowerMsg = res.data.message.toLowerCase();
+            if (lowerMsg.indexOf('duplicate') !== -1) {
+                toastr.error('Erro', 'Veículo já cadastrado.');
             }
-           
         }
     }
 };
 
-const refreshVehicle = (vehicletype) => {
+const refreshVehicle = (vehicletype, params) => {
     const asyncFunExec = async () => {
         const veiculo = await doFetchVehicle({ vehicletype });
         if (veiculo && veiculo.success) {
@@ -194,17 +205,29 @@ const refreshVehicle = (vehicletype) => {
                     type: 'modify_listcarros_veiculos',
                     payload: veiculo.data
                 });
+                store.dispatch({
+                    type: 'modify_isrefreshtabcar_veiculos',
+                    payload: true
+                });
             } else if (vehicletype === '2') {
                 store.dispatch({
                     type: 'modify_listmotos_veiculos',
                     payload: veiculo.data
+                });
+                store.dispatch({
+                    type: 'modify_isrefreshtabbike_veiculos',
+                    payload: true
                 });
             } else if (vehicletype === '3') {
                 store.dispatch({
                     type: 'modify_listcaminhoes_veiculos',
                     payload: veiculo.data
                 });
-            }  
+                store.dispatch({
+                    type: 'modify_isrefreshtabtruck_veiculos',
+                    payload: true
+                });
+            }
         }
     }
     asyncFunExec();

@@ -3,6 +3,9 @@ const INITIAL_STATE = {
     listCarros: [],
     listCaminhoes: [],
     listMotos: [],
+    isRefreshTabCar: false,
+    isRefreshTabBike: false,
+    isRefreshTabTruck: false,
     filterCarTabOpened: false,
     filterTruckTabOpened: false,
     filterBikeTabOpened: false,
@@ -74,6 +77,21 @@ export default (state = INITIAL_STATE, action) => {
                 ...state,
                 filterTruckTabOpened: action.payload
             };
+        case 'modify_isrefreshtabcar_veiculos':
+            return {
+                ...state,
+                isRefreshTabCar: action.payload
+            };
+        case 'modify_isrefreshtabbike_veiculos':
+            return {
+                ...state,
+                isRefreshTabBike: action.payload
+            };
+        case 'modify_isrefreshtabtruck_veiculos':
+            return {
+                ...state,
+                isRefreshTabTruck: action.payload
+            };
         case 'modify_filterbiketabopened_veiculos':
             return {
                 ...state,
@@ -85,6 +103,9 @@ export default (state = INITIAL_STATE, action) => {
                 listCarros: [],
                 listCaminhoes: [],
                 listMotos: [],
+                isRefreshTabCar: false,
+                isRefreshTabBike: false,
+                isRefreshTabTruck: false,
                 filterCarTabOpened: false,
                 filterTruckTabOpened: false,
                 filterBikeTabOpened: false,

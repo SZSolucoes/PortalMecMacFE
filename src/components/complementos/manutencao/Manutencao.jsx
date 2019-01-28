@@ -4,6 +4,7 @@ import { Field, reduxForm, getFormValues } from 'redux-form';
 import Main from '../../templates/Main';
 import RadioGroup from '../../utils/RadioGroup';
 import ManutencaoTable from './ManutencaoTable';
+import ManutMdfItem from './modals/ManutMdfItem';
 
 import { store } from '../../../index';
 
@@ -154,6 +155,7 @@ class Manutencao extends React.Component {
                         <ManutencaoTable itemsManut={this.props.dataTableManutencao} />
                     </Main>   
                 </div>
+                <ManutMdfItem />
             </div>
         );
     }
