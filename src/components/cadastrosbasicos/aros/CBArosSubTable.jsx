@@ -207,7 +207,14 @@ class CBArosSubTable extends Component {
     
     renderDropDownButton(csvProps) {
         return (
-            <ButtonDropdown isOpen={this.state.dropdownBtnOpen} toggle={this.onClickDropDownBtn}>
+            <ButtonDropdown 
+                isOpen={this.state.dropdownBtnOpen} 
+                toggle={this.onClickDropDownBtn}
+                style={{
+                    marginRight: 10,
+                    marginTop: 5
+                }}
+            >
                 <DropdownToggle caret>
                     Mais
                 </DropdownToggle>
@@ -296,7 +303,10 @@ class CBArosSubTable extends Component {
                                                         <button 
                                                             className="btn btn-danger"
                                                             onClick={() => this.onClickRemover()}
-                                                            style={{ marginRight: 10 }}
+                                                            style={{ 
+                                                                marginRight: 10,
+                                                                marginTop: 5
+                                                            }}
                                                         >
                                                             Remover
                                                         </button>
@@ -330,7 +340,12 @@ class CBArosSubTable extends Component {
                                                         </div>
                                                         {this.renderDropDownButton()}
                                                     </div>
-                                                    <div style={{ flex: 1 }}>
+                                                    <div 
+                                                        style={{ 
+                                                            flex: 1,
+                                                            marginTop: 5
+                                                        }}
+                                                    >
                                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
                                                     </div>
                                                 </div>

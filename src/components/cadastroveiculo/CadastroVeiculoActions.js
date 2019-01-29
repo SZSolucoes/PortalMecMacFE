@@ -1,9 +1,8 @@
 
-import { reset, change } from 'redux-form';
+import { change } from 'redux-form';
 import Axios from 'axios';
 import { toastr } from 'react-redux-toastr';
 import { BASEURL } from '../utils/urls';
-import { dbToState } from '../utils/dates';
 
 import { consultarMarcas, consultarModelos, consultarAnoModelo } from '../utils/fipeApi';
 import { doFetchVehicle } from '../utils/UtilsActions';
@@ -115,12 +114,30 @@ export const modifyVeiculoType = (value) => ({
 });
 
 export const doPostVeiculo = (params, funCleanModal) => dispatch => {
+    dispatch({
+        type: 'modify_overlaymodaltext_cadastroveiculo',
+        payload: 'Cadastro em andamento...'
+    });
+    dispatch({
+        type: 'modify_overlaymodal_cadastroveiculo',
+        payload: true
+    });
     Axios.post(`${BASEURL}veiculos`, params)
         .then(res => onPostVeiculoSuccess(dispatch, res, params, funCleanModal))
-        .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'));
+        .catch(() => {
+            dispatch({
+                type: 'modify_overlaymodal_cadastroveiculo',
+                payload: false
+            });
+            toastr.error('Erro', 'Falha de comunicação com o servidor.');
+        });
 };
 
 const onPostVeiculoSuccess = (dispatch, res, params, funCleanModal) => {
+    dispatch({
+        type: 'modify_overlaymodal_cadastroveiculo',
+        payload: false
+    });
     if (res && res.data) {
         if (res.data.success === 'true') {
             toastr.success('Sucesso', 'Cadastro realizado com sucesso.');
@@ -154,35 +171,34 @@ const onDeleteVeiculoSuccess = (dispatch, res, vehicletype) => {
     }
 };
 
-const onFetchSuccess = (dispatch, res) => {
-    if (res.data && Array.isArray(res.data)) {
-        res.data.map((prop) => {
-            prop.dtentreg = dbToState(prop.dtentreg);
-            prop.przentreg = dbToState(prop.przentreg);
-            prop.dtaprov = dbToState(prop.dtaprov);
-            return prop;
-        });
-        dispatch({
-            type: 'modify_listprop_monitor',
-            payload: res.data
-        });
-    }
-};
-
-const onFetchError = (e) => {
-
-};
-
 export const doPutVeiculo = (params, funCleanCloseModal) => dispatch => {
+    dispatch({
+        type: 'modify_overlaymodaltext_cadastroveiculo',
+        payload: 'Modificação em andamento...'
+    });
+    dispatch({
+        type: 'modify_overlaymodal_cadastroveiculo',
+        payload: true
+    });
     Axios.put(`${BASEURL}veiculos`, params)
         .then(res => onPutVeiculoSuccess(dispatch, res, params, funCleanCloseModal))
-        .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'));
+        .catch(() => {
+            dispatch({
+                type: 'modify_overlaymodal_cadastroveiculo',
+                payload: false
+            });
+            toastr.error('Erro', 'Falha de comunicação com o servidor.');
+        });
 };
 
 const onPutVeiculoSuccess = (dispatch, res, params, funCleanCloseModal) => {
+    dispatch({
+        type: 'modify_overlaymodal_cadastroveiculo',
+        payload: false
+    });
     if (res && res.data) {
         if (res.data.success === 'true') {
-            toastr.success('Sucesso', 'Cadastro realizado com sucesso.');
+            toastr.success('Sucesso', 'Modificação realizada com sucesso.');
             
             funCleanCloseModal().click();
             
@@ -191,7 +207,10 @@ const onPutVeiculoSuccess = (dispatch, res, params, funCleanCloseModal) => {
             const lowerMsg = res.data.message.toLowerCase();
             if (lowerMsg.indexOf('duplicate') !== -1) {
                 toastr.error('Erro', 'Veículo já cadastrado.');
+                return;
             }
+
+            toastr.error('Erro', 'Falha na modificação do veículo.');
         }
     }
 };

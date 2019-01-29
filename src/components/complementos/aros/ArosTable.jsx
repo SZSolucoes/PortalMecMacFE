@@ -6,9 +6,12 @@ import { onMount, onUnmount } from 'react-keydown/es/event_handlers';
 import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
 //import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
+import { change } from 'redux-form';
+import _ from 'lodash';
 
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../utils/UtilsActions';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css"
+import { store } from '../../..';
 
 class ManutencaoTable extends Component {
     constructor(props) {
@@ -17,6 +20,7 @@ class ManutencaoTable extends Component {
         this.handleOnSelect = this.handleOnSelect.bind(this);
         this.onKeyUpOrDown = this.onKeyUpOrDown.bind(this);
         this.onClickRemover = this.onClickRemover.bind(this);
+        this.onClickModify = this.onClickModify.bind(this);
 
         this.state = {
             selectRow: {
@@ -26,7 +30,9 @@ class ManutencaoTable extends Component {
                 hideSelectColumn: true,
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
-                selected: ['']
+                selected: [''],
+                selectedRow: {},
+                selectedIndex: -1
             }
         };
     }
@@ -39,10 +45,51 @@ class ManutencaoTable extends Component {
         onUnmount(this);
     }
 
+    componentDidUpdate(prevProps) {
+        const { selectedIndex, selectedRow } = this.state.selectRow;
+        let newSelectedRow = selectedRow;
+
+        if (
+            this.props.refreshTable && 
+            selectedIndex > -1 && 
+            (this.props.itemsAro.length - 1) >= selectedIndex &&
+            !_.isEqual(this.props.itemsAro[selectedIndex], prevProps.itemsAro[selectedIndex])
+        ) {
+            newSelectedRow = { ...this.props.itemsAro[selectedIndex] };
+            store.dispatch({
+                type: 'modify_refreshtable_aros',
+                payload: false
+            });
+
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [newSelectedRow.id], 
+                    selectedRow: newSelectedRow
+                } 
+            });
+        }
+    }
+
     onKeyUpOrDown(event) {
         //console.log(event);
     }
 
+    onClickModify() {
+        if (this.state.selectRow.selected[0]) {
+            const { selectedRow } = this.state.selectRow;
+
+            store.dispatch(change('arosmdfform', 'id', selectedRow.id));
+            store.dispatch(change('arosmdfform', 'arocombo', selectedRow.aro));
+            store.dispatch(change('arosmdfform', 'arosubcombo', selectedRow.subcat));
+            store.dispatch({
+                type: 'modify_formvalues_aros',
+                payload: selectedRow
+            });
+
+            this.arosMdfModalRef.click();
+        }
+    }
 
     onClickRemover() {
         if (this.state.selectRow.selected[0]) {
@@ -58,9 +105,27 @@ class ManutencaoTable extends Component {
 
     handleOnSelect(row, isSelect, rowIndex, e) {
         if (isSelect) {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [row.id] } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [row.id], 
+                    selectedRow: row,
+                    selectedIndex: rowIndex
+                }
+            });
+            this.props.onSuperChangeState({
+                refreshValue: row.aro,
+                refreshValueSub: row.subcat,
+            });
         } else {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [''] } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [''], 
+                    selectedRow: {},
+                    selectedIndex: -1 
+                },
+            });
         }
     }
 
@@ -111,9 +176,22 @@ class ManutencaoTable extends Component {
                                         <button 
                                             className="btn btn-danger"
                                             onClick={() => this.onClickRemover()}
-                                            style={{ marginRight: 10 }}
+                                            style={{ 
+                                                marginRight: 10,
+                                                marginTop: 5
+                                            }}
                                         >
                                             Remover
+                                        </button>
+                                        <button 
+                                            className="btn btn-dark"
+                                            onClick={() => this.onClickModify()}
+                                            style={{ 
+                                                marginRight: 10,
+                                                marginTop: 5
+                                            }}
+                                        >
+                                            Modificar
                                         </button>
                                         <button
                                             ref={ref => (this.arostableBtnConfirmModalRef = ref)}
@@ -121,11 +199,29 @@ class ManutencaoTable extends Component {
                                             data-toggle="modal" data-target="#confirmmodal"
                                             data-backdrop="static" data-keyboard="false"
                                         />
-                                        <CSVExport.ExportCSVButton { ...props.csvProps }>
+                                        <button
+                                            ref={ref => (this.arosMdfModalRef = ref)}
+                                            hidden
+                                            data-toggle="modal" data-target="#arosmdf"
+                                            data-backdrop="static" data-keyboard="false"
+                                        />
+                                        <CSVExport.ExportCSVButton 
+                                            { ...props.csvProps }
+                                            className="btn btn-secondary"
+                                            style={{
+                                                color: 'white',
+                                                marginTop: 5
+                                            }}
+                                        >
                                             Exportar CSV
                                         </CSVExport.ExportCSVButton>
                                     </div>
-                                    <div style={{ flex: 1 }}>
+                                    <div 
+                                        style={{ 
+                                            flex: 1,
+                                            marginTop: 5
+                                        }}
+                                    >
                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
                                     </div>
                                 </div>
@@ -151,7 +247,8 @@ class ManutencaoTable extends Component {
     }
 }
 
-const mapStateToProps = () => ({
+const mapStateToProps = (state) => ({
+    refreshTable: state.ArosReducer.refreshTable
 });
 
 setBinding({

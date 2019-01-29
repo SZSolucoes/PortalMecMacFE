@@ -12,12 +12,21 @@ import imgTruck from '../../assets/imgs/truck.png';
 import imgBike from '../../assets/imgs/bike.png';
 import TruckTab from './TruckTab';
 import BikeTab from './BikeTab';
+import { store } from '../..';
 
 class VeiculosTabs extends React.Component {
     render() {
         return (
             <Main>
-                <Tabs>
+                <Tabs
+                    selectedIndex={this.props.selectedIndex}
+                    onSelect={(index) => {
+                        store.dispatch({
+                            type: 'modify_selectedindex_veiculos',
+                            payload: index
+                        })
+                    }}
+                >
                     <TabList>
                         <Tab>
                             <div className="row" style={{ paddingRight: 30 }}>
@@ -53,7 +62,8 @@ class VeiculosTabs extends React.Component {
     }
 }
 
-const mapStateToProps = () => ({
+const mapStateToProps = (state) => ({
+    selectedIndex: state.VeiculosReducer.selectedIndex
 });
 
 export default connect(mapStateToProps, {

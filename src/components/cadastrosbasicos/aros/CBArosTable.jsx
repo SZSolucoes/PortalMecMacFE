@@ -37,6 +37,7 @@ class CBArosTable extends Component {
         this.renderDropDownButton = this.renderDropDownButton.bind(this);
         this.handleCsvFile = this.handleCsvFile.bind(this);
         this.handleCsvFileError = this.handleCsvFileError.bind(this);
+        this.onClickModify = this.onClickModify.bind(this);
 
         this.state = {
             selectRow: {
@@ -47,7 +48,8 @@ class CBArosTable extends Component {
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
                 selected: [''],
-                selectedRow: {}
+                selectedRow: {},
+                selectedIndex: -1
             },
             dropdownBtnOpen: false
         }
@@ -102,6 +104,22 @@ class CBArosTable extends Component {
         
         asyncFunExec();
         this.cbarostableBtnModalRef.click();
+    }
+
+    onClickModify() {
+        if (this.state.selectRow.selected[0]) {
+            const { selectedRow } = this.state.selectRow;
+
+            store.dispatch(change('cbarosmdfform', 'id', selectedRow.id));
+            store.dispatch(change('cbarosmdfform', 'vehicletype', selectedRow.vehicletype));
+            store.dispatch(change('cbarosmdfform', 'aro', selectedRow.aro));
+            store.dispatch({
+                type: 'modify_formvaluesaros_cbaros',
+                payload: selectedRow
+            });
+
+            this.cbArosMdfModalRef.click();
+        }
     }
 
     onClickRemover() {
@@ -278,7 +296,14 @@ class CBArosTable extends Component {
     
     renderDropDownButton(csvProps) {
         return (
-            <ButtonDropdown isOpen={this.state.dropdownBtnOpen} toggle={this.onClickDropDownBtn}>
+            <ButtonDropdown 
+                isOpen={this.state.dropdownBtnOpen} 
+                toggle={this.onClickDropDownBtn}
+                style={{ 
+                    marginRight: 10,
+                    marginTop: 5 
+                }}
+            >
                 <DropdownToggle caret>
                     Mais
                 </DropdownToggle>
@@ -310,7 +335,14 @@ class CBArosTable extends Component {
         });
         
         if (isSelect) {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [row.id], selectedRow: row } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [row.id], 
+                    selectedRow: row,
+                    selectedIndex: rowIndex
+                } 
+            });
             this.props.setSuperState({ selectedAroRowId: row.id });
             store.dispatch({
                 type: 'modify_arossubloading_cbaros',
@@ -319,7 +351,14 @@ class CBArosTable extends Component {
             
             this.props.doFetchCBArosSubs({ idaro: row.id });
         } else {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [''], selectedRow: {} } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [''], 
+                    selectedRow: {},
+                    selectedIndex: -1
+                } 
+            });
             this.props.setSuperState({ selectedAroRowId: '' });
             store.dispatch({
                 type: 'modify_arossubloading_cbaros',
@@ -413,9 +452,24 @@ class CBArosTable extends Component {
                                                         <button 
                                                             className="btn btn-primary"
                                                             onClick={() => this.onClickIncluir()}
-                                                            style={{ marginRight: 10, paddingLeft: 20, paddingRight: 20 }}
+                                                            style={{ 
+                                                                marginRight: 10, 
+                                                                paddingLeft: 20, 
+                                                                paddingRight: 20,
+                                                                marginTop: 5
+                                                            }}
                                                         >
                                                             Incluir
+                                                        </button>
+                                                        <button 
+                                                            className="btn btn-dark"
+                                                            onClick={() => this.onClickModify()}
+                                                            style={{ 
+                                                                marginRight: 10,
+                                                                marginTop: 5
+                                                            }}
+                                                        >
+                                                            Modificar
                                                         </button>
                                                         <button
                                                             ref={ref => (this.cbarostableBtnModalRef = ref)}
@@ -426,7 +480,10 @@ class CBArosTable extends Component {
                                                         <button 
                                                             className="btn btn-danger"
                                                             onClick={() => this.onClickRemover()}
-                                                            style={{ marginRight: 10 }}
+                                                            style={{ 
+                                                                marginRight: 10,
+                                                                marginTop: 5 
+                                                            }}
                                                         >
                                                             Remover
                                                         </button>
@@ -439,7 +496,11 @@ class CBArosTable extends Component {
                                                         <button 
                                                             className="btn btn-warning"
                                                             onClick={() => this.onClickSubCat()}
-                                                            style={{ marginRight: 10, color: 'white' }}
+                                                            style={{ 
+                                                                marginRight: 10, 
+                                                                color: 'white',
+                                                                marginTop: 5
+                                                             }}
                                                         >
                                                             Add Sub-categoria
                                                         </button>
@@ -472,8 +533,19 @@ class CBArosTable extends Component {
                                                             </CSVExport.ExportCSVButton>
                                                         </div>
                                                         {this.renderDropDownButton()}
+                                                        <button
+                                                            ref={ref => (this.cbArosMdfModalRef = ref)}
+                                                            hidden
+                                                            data-toggle="modal" data-target="#cbarosmdf"
+                                                            data-backdrop="static" data-keyboard="false"
+                                                        />
                                                     </div>
-                                                    <div style={{ flex: 1 }}>
+                                                    <div 
+                                                        style={{ 
+                                                            flex: 1,
+                                                            marginTop: 5 
+                                                        }}
+                                                    >
                                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
                                                     </div>
                                                 </div>

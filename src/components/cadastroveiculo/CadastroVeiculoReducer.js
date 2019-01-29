@@ -14,7 +14,9 @@ const INITIAL_STATE = {
         ano: '',
         valor: '',
         combustivel: ''
-    }
+    },
+    overlayModal: false,
+    overlayModalText: 'Em andamento...'
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -59,6 +61,16 @@ export default (state = INITIAL_STATE, action) => {
                 ...state,
                 formValues: { ...action.payload }
             };
+        case 'modify_overlaymodal_cadastroveiculo':
+            return {
+                ...state,
+                overlayModal: action.payload
+            };
+        case 'modify_overlaymodaltext_cadastroveiculo':
+            return {
+                ...state,
+                overlayModalText: action.payload
+            };
         case 'modify_clean_utils':
             return {
                 ...state,
@@ -69,7 +81,9 @@ export default (state = INITIAL_STATE, action) => {
                 fipeMarcas: [],
                 fipeModelos: [],
                 fipeAnos: [],
-                formValues: {}
+                formValues: {},
+                overlayModal: false,
+                overlayModalText: ''
             };
         default:
             return state;

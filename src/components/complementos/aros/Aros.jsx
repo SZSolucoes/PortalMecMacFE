@@ -10,6 +10,7 @@ import { store } from '../../../index';
 import { doPostCompAros } from './ArosActions';
 import { doGetDataTableCBArosSub } from '../../cadastrosbasicos/aros/CBArosActions';
 import './Aros.css';
+import ArosMdf from './modals/ArosMdf';
 
 class Aros extends React.Component {
     
@@ -19,9 +20,13 @@ class Aros extends React.Component {
         this.onClickAdicionar = this.onClickAdicionar.bind(this);
         this.renderField = this.renderField.bind(this);
         this.getSubCat = this.getSubCat.bind(this);
+        this.onSuperChangeState = this.onSuperChangeState.bind(this);
 
         this.state = {
-            subcatDisabled: false
+            subcatDisabled: false,
+            refreshSub: false,
+            refreshValue: '',
+            refreshValueSub: ''
         }
     }
 
@@ -29,7 +34,13 @@ class Aros extends React.Component {
         const formValues = getFormValues('aros')(store.getState());
         const vehicle = { ...this.props.item };
         const valueValid = formValues.arocombo && formValues.arosubcombo;
-        if (typeof vehicle === 'object' && Object.keys(vehicle).length && valueValid) {
+
+        if (!valueValid) {
+            alert('Para realizar a inclusão é necessário informar todos os campos.');
+            return;
+        }
+
+        if (typeof vehicle === 'object' && Object.keys(vehicle).length) {
             if (vehicle.vehicletype) {
                 let keyTable = {};
                 if (vehicle.vehicletype === '1') {
@@ -49,6 +60,10 @@ class Aros extends React.Component {
         }
     }
 
+    onSuperChangeState(newStates) {
+        this.setState({ ...newStates, refreshSub: !this.state.refreshSub });
+    }
+
     async getSubCat(event) {
         this.setState({ subcatDisabled: true });
         if (event.target.value) {
@@ -63,6 +78,8 @@ class Aros extends React.Component {
     
                     if (dataTableArosSub.data[0] && dataTableArosSub.data[0].subcat) {
                         store.dispatch(change('aros', 'arosubcombo', dataTableArosSub.data[0].subcat));
+                    } else {
+                        store.dispatch(change('aros', 'arosubcombo', ''));
                     }
                 }
             }
@@ -137,9 +154,17 @@ class Aros extends React.Component {
                 </div>
                 <div id={'arosmaintable'}>
                     <Main>
-                        <ArosTable itemsAro={this.props.dataTableAros} />
+                        <ArosTable 
+                            onSuperChangeState={this.onSuperChangeState}
+                            itemsAro={this.props.dataTableAros}
+                        />
                     </Main>   
                 </div>
+                <ArosMdf 
+                    refreshSub={this.state.refreshSub}
+                    refreshValue={this.state.refreshValue}
+                    refreshValueSub={this.state.refreshValueSub}
+                />
             </div>
         );
     }

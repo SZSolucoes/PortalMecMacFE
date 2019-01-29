@@ -7,6 +7,7 @@ import CBArosSubTable from './CBArosSubTable';
 import { socket } from '../../../main/App';
 import { store } from '../../../index';
 import { doGetDataTableCBAros } from './CBArosActions';
+import CBArosMdf from './modals/CBArosMdf';
 
 import './CBAros.css';
 
@@ -93,11 +94,11 @@ class CBAros extends Component {
                                     />
                                 </div>
                             </Main>
-
                         </div>
                     </div>
                 </Main>
                 <div style={{ marginBottom: 50 }} />
+                <CBArosMdf />
             </div>
         );
     }

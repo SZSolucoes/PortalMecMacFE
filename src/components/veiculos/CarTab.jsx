@@ -55,8 +55,6 @@ class CarTab extends React.Component {
                 type: 'modify_isrefreshtabcar_veiculos',
                 payload: false
             });
-
-            console.log(newSelectedRow);
             
             this.setState({ 
                 selectRow: { 
@@ -242,7 +240,10 @@ class CarTab extends React.Component {
                                     <div style={{ flex: 3 }}>
                                         <button 
                                             className="btn btn-primary cadbtn"
-                                            style={{ marginRight: 10 }}
+                                            style={{ 
+                                                marginRight: 10,
+                                                marginTop: 5
+                                            }}
                                             onClick={() => { 
                                                 this.props.doOpenVeiculoModal('1', '1');
                                                 this.incluirCarRef.click();
@@ -252,7 +253,10 @@ class CarTab extends React.Component {
                                         </button>
                                         <button 
                                             className="btn btn-dark cadbtn"
-                                            style={{ marginRight: 10 }}
+                                            style={{ 
+                                                marginRight: 10,
+                                                marginTop: 5
+                                            }}
                                             onClick={() => { 
                                                 this.onClickModify();
                                             }}
@@ -268,7 +272,10 @@ class CarTab extends React.Component {
                                         <button 
                                             className="btn btn-danger"
                                             onClick={() => this.onClickRemover()}
-                                            style={{ marginRight: 10 }}
+                                            style={{ 
+                                                marginRight: 10,
+                                                marginTop: 5 
+                                            }}
                                         >
                                             Remover
                                         </button>
@@ -281,14 +288,22 @@ class CarTab extends React.Component {
                                         <button 
                                             className="btn btn-warning"
                                             onClick={() => this.onClickComplementos()}
-                                            style={{ marginRight: 10, color: 'white' }}
+                                            style={{ 
+                                                marginRight: 10, 
+                                                color: 'white',
+                                                marginTop: 5 
+                                            }}
                                         >
                                             Complementos
                                         </button>
                                         <button 
                                             className="btn btn-info"
                                             onClick={() => this.onClickCPManual()}
-                                            style={{ marginRight: 10, color: 'white' }}
+                                            style={{ 
+                                                marginRight: 10, 
+                                                color: 'white',
+                                                marginTop: 5 
+                                            }}
                                         >
                                             Copiar Manual
                                         </button>
@@ -298,11 +313,23 @@ class CarTab extends React.Component {
                                             data-toggle="modal" data-target="#cpmanual"
                                             data-backdrop="static" data-keyboard="false"
                                         />
-                                        <CSVExport.ExportCSVButton { ...props.csvProps }>
+                                        <CSVExport.ExportCSVButton 
+                                            { ...props.csvProps }
+                                            className="btn btn-secondary"
+                                            style={{
+                                                color: 'white',
+                                                marginTop: 5
+                                            }}
+                                        >
                                             Exportar CSV
                                         </CSVExport.ExportCSVButton>
                                     </div>
-                                    <div style={{ flex: 1 }}>
+                                    <div 
+                                        style={{ 
+                                            flex: 1,
+                                            marginTop: 5 
+                                        }}
+                                    >
                                         <Search.SearchBar 
                                             { ...props.searchProps } 
                                             placeholder="Buscar..."

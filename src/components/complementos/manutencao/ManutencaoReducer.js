@@ -1,7 +1,9 @@
 
 const INITIAL_STATE = {
     itemManutencaoCombo: [],
-    dataTableManutencao: []
+    dataTableManutencao: [],
+    formValuesItemManut: {},
+    isRefreshManut: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -16,11 +18,23 @@ export default (state = INITIAL_STATE, action) => {
                 ...state,
                 dataTableManutencao: [...action.payload]
             };
+        case 'modify_formvaluesitemmanut_manutencao':
+            return {
+                ...state,
+                formValuesItemManut: { ...action.payload }
+            };
+        case 'modify_isrefreshmanut_manutencao':
+            return {
+                ...state,
+                isRefreshManut: action.payload
+            };
         case 'modify_clean_manutencao':
             return {
                 ...state,
                 itemManutencaoCombo: [],
-                dataTableManutencao: []
+                dataTableManutencao: [],
+                formValuesItemManut: {},
+                isRefreshManut: false
             };
         default:
             return state;

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import LoadingOverlay from 'react-loading-overlay';
 
 import scrollToComponent from 'react-scroll-to-component';
 import CadastroCarroForm from './CadastroVeiculoForm';
@@ -59,22 +60,32 @@ class CadastroVeiculo extends Component {
                     aria-labelledby="exampleModalLabel" 
                     aria-hidden="true"
                 >
-                    <div className="modal-dialog modal-auto-size" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h2 className="mt-3" ref={(ref) => { this.textCadProp = ref; }}>
-                                    <FontAwesomeIcon icon={this.getIconTitle()}/> {this.getModalTitle()}
-                                </h2>
-                            </div>
-                            <div className="modal-body">
-                                <React.Fragment>
-                                    <div className="p-3 mt-3">
-                                        <CadastroCarroForm />
-                                    </div>
-                                </React.Fragment>
+                    <LoadingOverlay
+                        active={this.props.overlayModal}
+                        spinner
+                        text={this.props.overlayModalText}
+                    >
+                        <div 
+                            className="modal-dialog modal-auto-size" 
+                            style={{ height: '100vh' }} 
+                            role="document"
+                        >
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h2 className="mt-3" ref={(ref) => { this.textCadProp = ref; }}>
+                                        <FontAwesomeIcon icon={this.getIconTitle()}/> {this.getModalTitle()}
+                                    </h2>
+                                </div>
+                                <div className="modal-body">
+                                    <React.Fragment>
+                                        <div className="p-3 mt-3">
+                                            <CadastroCarroForm />
+                                        </div>
+                                    </React.Fragment>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </LoadingOverlay>
                 </div>
             </div>
         );
@@ -83,7 +94,9 @@ class CadastroVeiculo extends Component {
 
 const mapStateToProps = (state) => ({
     formType: state.CadastroVeiculoReducer.formType,
-    formVeiculoType: state.CadastroVeiculoReducer.formVeiculoType
+    formVeiculoType: state.CadastroVeiculoReducer.formVeiculoType,
+    overlayModal: state.CadastroVeiculoReducer.overlayModal,
+    overlayModalText: state.CadastroVeiculoReducer.overlayModalText
 });
 
 export default connect(mapStateToProps, {

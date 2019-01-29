@@ -37,6 +37,31 @@ export const doPostManutencao = (params) => dispatch => {
         .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'));
 }
 
+export const doPutManutencao = (params, closeModalBtn) => dispatch => {
+    Axios.put(`${BASEURL}manutencao`, params)
+        .then(res => {
+            if (res && res.data) {
+                if (res.data.success === 'true') {
+                    dispatch({
+                        type: 'modify_isrefreshmanut_manutencao',
+                        payload: true
+                    })
+                    closeModalBtn().click();
+                    toastr.success('Sucesso', 'Modificação realizada com sucesso.');
+                } else {
+                    const lowerMsg = res.data.message.toLowerCase();
+                    if (lowerMsg.indexOf('duplicate') !== -1) {
+                        toastr.error('Erro', 'Registro já cadastrado.');
+                        return;
+                    }
+
+                    toastr.error('Erro', 'Falha na modificação do item.');
+                }
+            }
+        })
+        .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'));
+}
+
 export const doDeleteManutencao = (id) => dispatch => {
     Axios.delete(`${BASEURL}manutencao`, {
         params: {

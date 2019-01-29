@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux';
-import { Field, reduxForm, getFormValues } from 'redux-form';
+import { Field, reduxForm, change } from 'redux-form';
 import RadioGroup from '../../../utils/RadioGroup';
 
 import { store } from '../../../../index';
+import { doPutManutencao } from '../../manutencao/ManutencaoActions';
 
 class ManutMdfItemForm extends React.Component {
     
@@ -12,32 +13,43 @@ class ManutMdfItemForm extends React.Component {
 
         this.renderField = this.renderField.bind(this);
         this.onSubmitModifyForm = this.onSubmitModifyForm.bind(this);
+        this.resetFields = this.resetFields.bind(this);
     }
 
     onSubmitModifyForm(values) {
         const {
-            fipemesano,
-            marca,
-            modelo,
-            ano,
-            valor,
-            combustivel
+            id,
+            mes,
+            milhas,
+            km,
+            manutencao,
         } = values;
 
-        const newId = `${fipemesano.trim()}|${marca.trim()}|${modelo.trim()}|${ano.trim()}`;
+        const params = {
+            id,
+            mes,
+            milhas,
+            quilometros: km,
+            tipomanut: manutencao
+        };
 
-        const newValues = {
-            id: newId,
-            fipeperiodoref: fipemesano,
-            marca,
-            modelo,
-            ano,
-            valor,
-            combustivel,
-            vehicletype: this.props.formVeiculoType
-         };
+        this.props.doPutManutencao(params, () => this.closeBtn);
+    }
 
-        //this.props.doPutModifyItemComp(newValues, () => this.closeBtn);
+    resetFields(reset) {
+        const {
+            formValues
+        } = this.props;
+
+        reset();
+
+        store.dispatch(change('manutmdfitemform', 'id', formValues.id));
+        store.dispatch(change('manutmdfitemform', 'itemmanut', formValues.itemmanut));
+        store.dispatch(change('manutmdfitemform', 'mes', formValues.mes));
+        store.dispatch(change('manutmdfitemform', 'milhas', formValues.milhas));
+        store.dispatch(change('manutmdfitemform', 'km', formValues.quilometros));
+        store.dispatch(change('manutmdfitemform', 'manutencao', formValues.tipomanut));
+        
     }
 
     renderField({ input, label, type, meta: { touched, error, warning, submitFailed } }) {
@@ -60,19 +72,14 @@ class ManutMdfItemForm extends React.Component {
                 <div className='row'>
                     <div className='col-12'>
                         <div className='form-group'>
-                            <label htmlFor='itemmanut'>Itens de Manutenção</label>
-                            <Field 
-                                component="select" 
-                                className="form-control" 
-                                name="itemmanut"
-                                //onChange={event => this.consultarFipe(event, 'fipeperiodoref')}
-                            >
-                                {
-                                        this.props.itemManutencaoCombo.map((value, index) => 
-                                        <option key={index} value={value.item}>{value.item}</option>
-                                    )
-                                }
-                            </Field>
+                            <label htmlFor='itemmanut'>Item de Manutenção</label>
+                            <Field
+                                component={'input'}
+                                className='form-control' 
+                                name='itemmanut'
+                                disabled={true}
+                                value={FldValue}
+                            />
                         </div>
                     </div>
                 </div>
@@ -84,7 +91,6 @@ class ManutMdfItemForm extends React.Component {
                                 component={this.renderField}
                                 className='form-control' 
                                 name='mes'
-                                disabled
                                 value={FldValue}
                             />
                         </div>
@@ -96,7 +102,6 @@ class ManutMdfItemForm extends React.Component {
                                 component={this.renderField} 
                                 className='form-control' 
                                 name='milhas'
-                                disabled
                             />
                         </div>
                     </div>
@@ -107,7 +112,6 @@ class ManutMdfItemForm extends React.Component {
                                 component={this.renderField} 
                                 className='form-control' 
                                 name='km'
-                                disabled
                                 value={anoFldValue}
                             />
                         </div>
@@ -150,7 +154,7 @@ class ManutMdfItemForm extends React.Component {
                             disabled={pristine || submitting}
                             onClick={() => this.resetFields(reset)}
                         >
-                            {this.props.formType === '2' ? 'Restaurar' : 'Limpar'}
+                            Restaurar
                         </button>
                         <button 
                             type="button" 
@@ -172,7 +176,9 @@ const mapStateToProps = (state) => ({
     item: state.ComplementosReducer.item,
     itemManutencaoCombo: state.ManutencaoReducer.itemManutencaoCombo,
     dataTableManutencao: state.ManutencaoReducer.dataTableManutencao,
+    formValues: state.ManutencaoReducer.formValuesItemManut,
     initialValues: {
+        id: '',
         itemmanut: '',
         mes: '',
         milhas: '',
@@ -187,5 +193,6 @@ ManutMdfItemForm = reduxForm({
 })(ManutMdfItemForm); 
 
 export default connect(mapStateToProps, {
+    doPutManutencao
 })(ManutMdfItemForm);
 

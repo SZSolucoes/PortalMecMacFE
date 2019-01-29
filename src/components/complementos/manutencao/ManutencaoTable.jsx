@@ -4,11 +4,14 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { onMount, onUnmount } from 'react-keydown/es/event_handlers';
 import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
+import { change } from 'redux-form';
+import _ from 'lodash';
 //import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
 
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../utils/UtilsActions';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css"
+import { store } from '../../..';
 
 class ManutencaoTable extends Component {
     constructor(props) {
@@ -17,6 +20,7 @@ class ManutencaoTable extends Component {
         this.handleOnSelect = this.handleOnSelect.bind(this);
         this.onKeyUpOrDown = this.onKeyUpOrDown.bind(this);
         this.onClickRemover = this.onClickRemover.bind(this);
+        this.onClickModify = this.onClickModify.bind(this);
 
         this.state = {
             selectRow: {
@@ -26,23 +30,70 @@ class ManutencaoTable extends Component {
                 hideSelectColumn: true,
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
-                selected: ['']
+                selected: [''],
+                selectedRow: {},
+                selectedIndex: -1
             }
         };
     }
 
     componentDidMount() {
-        onMount(this);
+        onMount(this);   
     }
 
     componentWillUnmount() {
         onUnmount(this);
     }
 
+    componentDidUpdate(prevProps) {
+        const { selectedIndex, selectedRow } = this.state.selectRow;
+        let newSelectedRow = selectedRow;
+
+        if (
+            this.props.isRefreshManut && 
+            selectedIndex > -1 && 
+            (this.props.itemsManut.length - 1) >= selectedIndex &&
+            !_.isEqual(this.props.itemsManut[selectedIndex], prevProps.itemsManut[selectedIndex])
+        ) {
+            newSelectedRow = { ...this.props.itemsManut[selectedIndex] };
+            store.dispatch({
+                type: 'modify_isrefreshmanut_manutencao',
+                payload: false
+            });
+
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [newSelectedRow.id], 
+                    selectedRow: newSelectedRow
+                } 
+            });
+        }
+    }
+
     onKeyUpOrDown(event) {
         //console.log(event);
     }
 
+    onClickModify() {
+        if (this.state.selectRow.selected[0]) {
+            const { selectedRow } = this.state.selectRow;
+
+            store.dispatch(change('manutmdfitemform', 'id', selectedRow.id));
+            store.dispatch(change('manutmdfitemform', 'itemmanut', selectedRow.itemmanut));
+            store.dispatch(change('manutmdfitemform', 'mes', selectedRow.mes));
+            store.dispatch(change('manutmdfitemform', 'milhas', selectedRow.milhas));
+            store.dispatch(change('manutmdfitemform', 'km', selectedRow.quilometros));
+            store.dispatch(change('manutmdfitemform', 'manutencao', selectedRow.tipomanut));
+            store.dispatch({
+                type: 'modify_formvaluesitemmanut_manutencao',
+                payload: selectedRow
+            });
+
+            this.manutMdfItemModalRef.click();
+        }
+
+    }
 
     onClickRemover() {
         if (this.state.selectRow.selected[0]) {
@@ -58,9 +109,23 @@ class ManutencaoTable extends Component {
 
     handleOnSelect(row, isSelect, rowIndex, e) {
         if (isSelect) {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [row.id] } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [row.id], 
+                    selectedRow: row,
+                    selectedIndex: rowIndex
+                } 
+            });
         } else {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [''] } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [''], 
+                    selectedRow: {},
+                    selectedIndex: -1 
+                }
+            });
         }
     }
 
@@ -77,9 +142,9 @@ class ManutencaoTable extends Component {
             }, 
             {
                 dataField: 'itemmanut',
-                text: 'Itens Manutenção',
+                text: 'Item Manutenção',
                 sort: true,
-                headerStyle: { textAlign: 'left', whiteSpace: 'nowrap' },
+                headerStyle: { textAlign: 'left' },
                 style: { textAlign: 'left' }
             }, 
             {
@@ -132,14 +197,20 @@ class ManutencaoTable extends Component {
                                         <button 
                                             className="btn btn-danger"
                                             onClick={() => this.onClickRemover()}
-                                            style={{ marginRight: 10 }}
+                                            style={{ 
+                                                marginRight: 10,
+                                                marginTop: 5 
+                                            }}
                                         >
                                             Remover
                                         </button>
                                         <button 
                                             className="btn btn-dark"
-                                            onClick={() => this.manutMdfItemModalRef.click()}
-                                            style={{ marginRight: 10 }}
+                                            onClick={() => this.onClickModify()}
+                                            style={{ 
+                                                marginRight: 10,
+                                                marginTop: 5
+                                            }}
                                         >
                                             Modificar
                                         </button>
@@ -155,11 +226,23 @@ class ManutencaoTable extends Component {
                                             data-toggle="modal" data-target="#manutmdfitem"
                                             data-backdrop="static" data-keyboard="false"
                                         />
-                                        <CSVExport.ExportCSVButton { ...props.csvProps }>
+                                        <CSVExport.ExportCSVButton 
+                                            { ...props.csvProps }
+                                            className="btn btn-secondary"
+                                            style={{
+                                                color: 'white',
+                                                marginTop: 5
+                                            }}
+                                        >
                                             Exportar CSV
                                         </CSVExport.ExportCSVButton>
                                     </div>
-                                    <div style={{ flex: 1 }}>
+                                    <div 
+                                        style={{ 
+                                            flex: 1,
+                                            marginTop: 5
+                                        }}
+                                    >
                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
                                     </div>
                                 </div>
@@ -185,7 +268,8 @@ class ManutencaoTable extends Component {
     }
 }
 
-const mapStateToProps = () => ({
+const mapStateToProps = (state) => ({
+    isRefreshManut: state.ManutencaoReducer.isRefreshManut
 });
 
 setBinding({

@@ -3,6 +3,7 @@ const INITIAL_STATE = {
     listCarros: [],
     listCaminhoes: [],
     listMotos: [],
+    selectedIndex: 0,
     isRefreshTabCar: false,
     isRefreshTabBike: false,
     isRefreshTabTruck: false,
@@ -72,6 +73,11 @@ export default (state = INITIAL_STATE, action) => {
                 ...state,
                 filterCarTabOpened: action.payload
             };
+        case 'modify_selectedindex_veiculos':
+            return {
+                ...state,
+                selectedIndex: action.payload
+            };
         case 'modify_filtertrucktabopened_veiculos':
             return {
                 ...state,
@@ -103,6 +109,7 @@ export default (state = INITIAL_STATE, action) => {
                 listCarros: [],
                 listCaminhoes: [],
                 listMotos: [],
+                selectedIndex: 0,
                 isRefreshTabCar: false,
                 isRefreshTabBike: false,
                 isRefreshTabTruck: false,

@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 import { reducer as ToastrReducer } from 'react-redux-toastr';
 import { reducer as formReducer } from 'redux-form';
 
+import AppReducer from '../../main/AppReducer';
 import VeiculosReducer from '../veiculos/VeiculosReducer';
 import CadastroVeiculoReducer from '../cadastroveiculo/CadastroVeiculoReducer';
 import ParametrosReducer from '../parametros/ParametrosReducer';
@@ -15,6 +16,7 @@ import CPManualReducer from '../veiculos/cpmanual/CPManualReducer';
 import VincularReducer from '../cadastrosbasicos/itemmanutencao/vinculo/VincularReducer';
 
 export default combineReducers({
+    AppReducer,
     VeiculosReducer,
     CadastroVeiculoReducer,
     ParametrosReducer,
