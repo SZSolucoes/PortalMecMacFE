@@ -31,8 +31,7 @@ class ManutencaoTable extends Component {
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
                 selected: [''],
-                selectedRow: {},
-                selectedIndex: -1
+                selectedRow: {}
             }
         };
     }
@@ -46,16 +45,17 @@ class ManutencaoTable extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        const { selectedIndex, selectedRow } = this.state.selectRow;
+        const { itemsManut, isRefreshManut } = this.props;
+        const { selectedRow } = this.state.selectRow;
+        const indexFounded = _.findIndex(itemsManut, itm => itm.id === selectedRow.id);
+
         let newSelectedRow = selectedRow;
 
-        if (
-            this.props.isRefreshManut && 
-            selectedIndex > -1 && 
-            (this.props.itemsManut.length - 1) >= selectedIndex &&
-            !_.isEqual(this.props.itemsManut[selectedIndex], prevProps.itemsManut[selectedIndex])
+        if (isRefreshManut &&
+            indexFounded !== -1 &&
+            !_.isEqual(itemsManut[indexFounded], prevProps.itemsManut[indexFounded])
         ) {
-            newSelectedRow = { ...this.props.itemsManut[selectedIndex] };
+            newSelectedRow = { ...itemsManut[indexFounded] };
             store.dispatch({
                 type: 'modify_isrefreshmanut_manutencao',
                 payload: false
@@ -80,6 +80,7 @@ class ManutencaoTable extends Component {
             const { selectedRow } = this.state.selectRow;
 
             store.dispatch(change('manutmdfitemform', 'id', selectedRow.id));
+            store.dispatch(change('manutmdfitemform', 'itemabrev', selectedRow.itemabrev));
             store.dispatch(change('manutmdfitemform', 'itemmanut', selectedRow.itemmanut));
             store.dispatch(change('manutmdfitemform', 'mes', selectedRow.mes));
             store.dispatch(change('manutmdfitemform', 'milhas', selectedRow.milhas));
@@ -113,8 +114,7 @@ class ManutencaoTable extends Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [row.id], 
-                    selectedRow: row,
-                    selectedIndex: rowIndex
+                    selectedRow: row
                 } 
             });
         } else {
@@ -122,8 +122,7 @@ class ManutencaoTable extends Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [''], 
-                    selectedRow: {},
-                    selectedIndex: -1 
+                    selectedRow: {}
                 }
             });
         }
@@ -132,6 +131,7 @@ class ManutencaoTable extends Component {
     render() {
         const { columns, itemsManut } = this.props;
         const dataTable = itemsManut || [];
+
         const columnsTable = columns || [
             {
                 dataField: 'id',
@@ -141,11 +141,18 @@ class ManutencaoTable extends Component {
                 csvExport: false
             }, 
             {
+                dataField: 'itemabrev',
+                text: 'Nome Abrev.',
+                sort: true,
+                headerStyle: { textAlign: 'left' },
+                style: { textAlign: 'left', overflow: 'auto' }
+            }, 
+            {
                 dataField: 'itemmanut',
                 text: 'Item Manutenção',
                 sort: true,
                 headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left' }
+                style: { textAlign: 'left', overflow: 'auto' }
             }, 
             {
                 dataField: 'mes',
@@ -258,6 +265,12 @@ class ManutencaoTable extends Component {
                                     //filter={filterFactory()}
                                     exportCsv
                                     bootstrap4
+                                    defaultSorted={
+                                        [{
+                                            dataField: 'id',
+                                            order: 'desc'
+                                        }]
+                                    }
                                 />
                             </div>
                         )

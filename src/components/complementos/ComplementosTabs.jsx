@@ -59,9 +59,9 @@ class ComplementosTabs extends React.Component {
                     type: 'modify_itemmanutencaocombo_manutencao',
                     payload: dataTable.data
                 });
-                
-                if (dataTable.data[0] && dataTable.data[0].item) {
-                    store.dispatch(change('manutencao', 'itemmanut', dataTable.data[0].item)); 
+
+                if (dataTable.data[0] && dataTable.data[0].itemmanutid) {
+                    store.dispatch(change('manutencao', 'iditemmanut', dataTable.data[0].itemmanutid)); 
                 }
             }
         }

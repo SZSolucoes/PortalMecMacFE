@@ -7,9 +7,9 @@ import {
     required
 } from '../../../utils/validForms';
 
-import { doPutItem } from '../CBArosActions';
+import { doPutItemSub } from '../CBArosActions';
 
-class CBArosMdfForm extends React.Component {   
+class CBArosSubMdfForm extends React.Component {   
     constructor(props) {
         super(props);
 
@@ -21,34 +21,34 @@ class CBArosMdfForm extends React.Component {
     onSubmitModifyForm(values) {
         const {
             id,
-            vehicletype,
-            aro
+            idaro,
+            subcat
         } = values;
 
-        if (!(vehicletype && aro)) {
+        if (!(id && idaro && subcat.trim())) {
             alert('Para realizar a inclusão é necessário informar todos os campos.');
             return;
         }
 
         const params = {
             id,
-            vehicletype,
-            aro
+            subcat,
+            idaro 
         };
 
-        this.props.doPutItem(params, () => this.closeBtn);
+        this.props.doPutItemSub(params, () => this.closeBtn);
     }
 
     resetFields(reset) {
         const {
-            formValuesAros
+            formValuesArosSub
         } = this.props;
 
         reset();
 
-        store.dispatch(change('cbarosmdfform', 'id', formValuesAros.id));
-        store.dispatch(change('cbarosmdfform', 'vehicletype', formValuesAros.vehicletype));
-        store.dispatch(change('cbarosmdfform', 'aro', formValuesAros.aro));
+        store.dispatch(change('cbarossubmdfform', 'id', formValuesArosSub.id));
+        store.dispatch(change('cbarossubmdfform', 'idaro', formValuesArosSub.idaro));
+        store.dispatch(change('cbarossubmdfform', 'subcat', formValuesArosSub.subcat));
     }
 
     renderField({ input, label, type, meta: { touched, error, warning, submitFailed } }) {
@@ -61,45 +61,73 @@ class CBArosMdfForm extends React.Component {
     } 
 
     render() {
-        const { handleSubmit, pristine, reset, submitting } = this.props;
+        const { handleSubmit, pristine, reset, submitting, arosSubValues } = this.props
+        const idaro = arosSubValues.id || '';
+        const aro = arosSubValues.aro || '';
+        let vehicletype = arosSubValues.vehicletype || '';
+
+        if (vehicletype === '1') {
+            vehicletype = 'Carro';
+        } else if (vehicletype === '2') {
+            vehicletype = 'Moto';
+        } else if (vehicletype === '3') {
+            vehicletype = 'Caminhão';
+        }
 
         return (
             <form onSubmit={handleSubmit(this.onSubmitModifyForm)}>
                 <div className="row">
-                    <div className="col-12 col-md-3">
+                    <div className="col-12 col-md-2">
                         <div className="form-group">
-                            <label htmlFor="id">ID</label>
-                            <Field 
-                                component="input"
+                            <label htmlFor="id">ID Aro</label>
+                            <input 
                                 type="text"
                                 className="form-control" 
-                                name="id"
+                                name="idaro"
                                 disabled
+                                value={idaro}
+                            />
+                        </div>
+                    </div>
+                    <div className="col-12 col-md-3">
+                        <div className="form-group">
+                            <label 
+                                htmlFor="vehicletype"
+                                style={{
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                Tipo de Veículo
+                            </label>
+                            <input 
+                                type="text"
+                                className="form-control" 
+                                name="vehicletype"
+                                disabled
+                                value={vehicletype}
+                            />
+                        </div>
+                    </div> 
+                    <div className="col-12 col-md-3">
+                        <div className="form-group">
+                            <label htmlFor="aro">Aro</label>
+                            <input 
+                                type="text"
+                                className="form-control" 
+                                name="ano"
+                                disabled
+                                value={aro}
                             />
                         </div>
                     </div>
                     <div className="col-12 col-md-4">
                         <div className="form-group">
-                            <label htmlFor="vehicletype">Tipo de Veículo *</label>
-                            <Field 
-                                component="select" 
-                                className="form-control" 
-                                name="vehicletype"
-                            >
-                                <option key={'1'} value={'1'}>Carro</option>
-                                <option key={'2'} value={'3'}>Caminhão</option>
-                                <option key={'3'} value={'2'}>Moto</option>
-                            </Field>
-                        </div>
-                    </div> 
-                    <div className="col-12 col-md-5">
-                        <div className="form-group">
-                            <label htmlFor="aro">Aro *</label>
+                            <label htmlFor="subcat">Sub-categoria *</label>
                             <Field 
                                 component={this.renderField}
                                 type="text"
                                 className="form-control" 
-                                name="aro"
+                                name="subcat"
                                 validate={[ required ]}
                             />
                         </div>
@@ -144,20 +172,20 @@ class CBArosMdfForm extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    formValuesAros: state.CBArosReducer.formValuesAros,
+    formValuesArosSub: state.CBArosReducer.formValuesArosSub,
+    arosSubValues: state.CBArosReducer.arosSubValues,
     initialValues: {
         id: '',
-        vehicletype: '1',
-        aro: ''
-    },
+        subcat: ''
+    }
 });
 
-CBArosMdfForm = reduxForm({
-    form: 'cbarosmdfform',
+CBArosSubMdfForm = reduxForm({
+    form: 'cbarossubmdfform',
     destroyOnUnmount: false
-})(CBArosMdfForm); 
+})(CBArosSubMdfForm); 
 
 export default connect(mapStateToProps, {
-    doPutItem
-})(CBArosMdfForm);
+    doPutItemSub
+})(CBArosSubMdfForm);
 

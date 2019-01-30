@@ -65,9 +65,16 @@ class CBArosTableForm extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <div className="col-12 col-md-2">
+                            <div className="col-12 col-md-3">
                                 <div className="form-group">
-                                    <label htmlFor="vehicletype">Tipo de Veículo</label>
+                                    <label 
+                                        htmlFor="vehicletype"
+                                        style={{
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+                                        Tipo de Veículo
+                                    </label>
                                     <input 
                                         type="text"
                                         className="form-control" 
@@ -89,7 +96,7 @@ class CBArosTableForm extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <div className="col-12 col-md-5">
+                            <div className="col-12 col-md-4">
                                 <div className="form-group">
                                     <label htmlFor="subcat">Sub-categoria *</label>
                                     <Field 

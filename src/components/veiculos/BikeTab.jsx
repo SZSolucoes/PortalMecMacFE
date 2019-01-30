@@ -6,6 +6,7 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../utils/UtilsActions';
 import { withRouter } from 'react-router-dom';
+import _ from 'lodash';
 
 import {
     doOpenVeiculoModal
@@ -36,18 +37,20 @@ class BikeTab extends React.Component {
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
                 selected: [''],
-                selectedRow: {},
-                selectedIndex: -1
+                selectedRow: {}
             }
         };
     }
 
     componentDidUpdate() {
-        const { selectedIndex, selectedRow } = this.state.selectRow;
+        const { listMotos } = this.props;
+        const { selectedRow } = this.state.selectRow;
+        const indexFounded = _.findIndex(listMotos, bk => bk.recrow === selectedRow.recrow);
+        
         let newSelectedRow = selectedRow;
 
-        if (selectedIndex > -1 && (this.props.listMotos.length - 1) >= selectedIndex) {
-            newSelectedRow = { ...this.props.listMotos[selectedIndex] };
+        if (indexFounded !== -1) {
+            newSelectedRow = { ...listMotos[indexFounded] };
         }
 
         if (this.props.isRefreshTabBike) {
@@ -55,7 +58,7 @@ class BikeTab extends React.Component {
                 type: 'modify_isrefreshtabbike_veiculos',
                 payload: false
             });
-
+            
             this.setState({ 
                 selectRow: { 
                     ...this.state.selectRow, 
@@ -122,8 +125,7 @@ class BikeTab extends React.Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [row.id], 
-                    selectedRow: row,
-                    selectedIndex: rowIndex
+                    selectedRow: row
                 } 
             });
         } else {
@@ -131,8 +133,7 @@ class BikeTab extends React.Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [''], 
-                    selectedRow: {},
-                    selectedIndex: -1 
+                    selectedRow: {}
                 }
             });
         }
@@ -141,6 +142,12 @@ class BikeTab extends React.Component {
     render() {
         const dataTable = this.props.listMotos || [];
         const columnsTable = [
+            {
+                dataField: 'recrow',
+                text: 'recrow',
+                hidden: true,
+                csvExport: false
+            }, 
             {
                 dataField: 'id',
                 text: 'id',
@@ -334,7 +341,6 @@ class BikeTab extends React.Component {
                                     </div>
                                 </div>
                                 <BootstrapTable
-                                    
                                     { ...props.baseProps } 
                                     selectRow={this.state.selectRow}
                                     pagination={paginationFactory()}
@@ -343,6 +349,12 @@ class BikeTab extends React.Component {
                                     filter={filterFactory()}
                                     exportCsv
                                     bootstrap4
+                                    defaultSorted={
+                                        [{
+                                            dataField: 'recrow',
+                                            order: 'desc'
+                                        }]
+                                    }
                                 />
                             </div>
                         )

@@ -31,6 +31,10 @@ export const doPostManutencao = (params) => dispatch => {
                     if (lowerMsg.indexOf('duplicate') !== -1) {
                         toastr.error('Erro', 'Registro já cadastrado.');
                     }
+
+                    if (res.data.success === 'false') {
+                        toastr.error('Erro', res.data.message);
+                    }
                 }
             }
         })

@@ -12,9 +12,11 @@ import ReactDropzone from "react-dropzone";
 import _ from 'lodash';
 import { toastr } from 'react-redux-toastr';
 import Papa from 'papaparse';
+import { change } from 'redux-form';
 
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../utils/UtilsActions';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css"
+import { store } from '../../..';
 
 const NoDataIndication = () => (
     <div 
@@ -51,7 +53,8 @@ class CBArosSubTable extends Component {
                 hideSelectColumn: true,
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
-                selected: ['']
+                selected: [''],
+                selectedRow: {}
             },
             dropdownBtnOpen: false
         }
@@ -65,8 +68,68 @@ class CBArosSubTable extends Component {
         onUnmount(this);
     }
 
+    componentDidUpdate(prevProps) {
+        const { data, refreshTableArosSub, arosSubLoading } = this.props;
+        const { selectedRow } = this.state.selectRow;
+        const indexFounded = _.findIndex(data, dt => dt.id === selectedRow.id);
+
+        let newSelectedRow = selectedRow;
+
+        if (prevProps.arosSubLoading !== arosSubLoading) {
+            this.setState({
+                selectRow: {
+                    mode: 'radio',
+                    clickToSelect: true,
+                    bgColor: '#007BFF',
+                    hideSelectColumn: true,
+                    style: { color: 'white' },
+                    onSelect: this.handleOnSelect,
+                    selected: [''],
+                    selectedRow: {}
+                },
+                dropdownBtnOpen: false
+            });
+        }
+
+        if (
+            refreshTableArosSub && 
+            indexFounded !== -1 &&
+            !_.isEqual(data[indexFounded], prevProps.data[indexFounded])
+        ) {
+            newSelectedRow = { ...data[indexFounded] };
+            store.dispatch({
+                type: 'modify_refreshtablearossub_cbaros',
+                payload: false
+            });
+
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [newSelectedRow.id], 
+                    selectedRow: newSelectedRow
+                } 
+            });
+        }
+    }
+
     onKeyUpOrDown(event) {
         //console.log(event);
+    }
+
+    onClickModify() {
+        if (this.state.selectRow.selected[0] && this.props.data.length) {
+            const { selectedRow } = this.state.selectRow;
+
+            store.dispatch(change('cbarossubmdfform', 'id', selectedRow.id));
+            store.dispatch(change('cbarossubmdfform', 'idaro', selectedRow.idaro));
+            store.dispatch(change('cbarossubmdfform', 'subcat', selectedRow.subcat));
+            store.dispatch({
+                type: 'modify_formvaluesarossub_cbaros',
+                payload: selectedRow
+            }); 
+
+            this.cbArosSubMdfModalRef.click();
+        }
     }
 
     onClickRemover() {
@@ -241,9 +304,21 @@ class CBArosSubTable extends Component {
 
     handleOnSelect(row, isSelect, rowIndex, e) {
         if (isSelect) {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [row.id] } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [row.id], 
+                    selectedRow: row
+                } 
+            });
         } else {
-            this.setState({ selectRow: { ...this.state.selectRow, selected: [''] } });
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [''], 
+                    selectedRow: {}
+                } 
+            });
         }
     }
 
@@ -310,6 +385,16 @@ class CBArosSubTable extends Component {
                                                         >
                                                             Remover
                                                         </button>
+                                                        <button 
+                                                            className="btn btn-dark"
+                                                            onClick={() => this.onClickModify()}
+                                                            style={{ 
+                                                                marginRight: 10,
+                                                                marginTop: 5
+                                                            }}
+                                                        >
+                                                            Modificar
+                                                        </button>
                                                         <button
                                                             ref={ref => (this.cbarossubtableBtnConfirmModalRef = ref)}
                                                             hidden
@@ -339,6 +424,12 @@ class CBArosSubTable extends Component {
                                                             </CSVExport.ExportCSVButton>
                                                         </div>
                                                         {this.renderDropDownButton()}
+                                                        <button
+                                                            ref={ref => (this.cbArosSubMdfModalRef = ref)}
+                                                            hidden
+                                                            data-toggle="modal" data-target="#cbarossubmdf"
+                                                            data-backdrop="static" data-keyboard="false"
+                                                        />
                                                     </div>
                                                     <div 
                                                         style={{ 
@@ -361,7 +452,18 @@ class CBArosSubTable extends Component {
                                                     //filter={filterFactory()}
                                                     exportCsv
                                                     bootstrap4
-                                                    noDataIndication={this.props.arosSubLoading ? () => <NoDataIndication /> : null}
+                                                    defaultSorted={
+                                                        [{
+                                                            dataField: 'id',
+                                                            order: 'desc'
+                                                        }]
+                                                    }
+                                                    noDataIndication={
+                                                        this.props.arosSubLoading ? 
+                                                        () => <NoDataIndication /> 
+                                                        : 
+                                                        null
+                                                    }
                                                 />
                                             </div>
                                         )
@@ -377,7 +479,8 @@ class CBArosSubTable extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    arosSubLoading: state.CBArosReducer.arosSubLoading
+    arosSubLoading: state.CBArosReducer.arosSubLoading,
+    refreshTableArosSub: state.CBArosReducer.refreshTableArosSub
 });
 
 setBinding({

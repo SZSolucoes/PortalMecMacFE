@@ -10,6 +10,7 @@ import { doGetDataTableItemManutencao } from './ItemManutencaoActions';
 
 import './ItemManutencao.css';
 import VincularModal from './vinculo/VincularModal';
+import ItemManutencaoMdf from './modals/ItemManutencaoMdf';
 
 class ItemManutencao extends Component {
     constructor(props) {
@@ -69,19 +70,15 @@ class ItemManutencao extends Component {
                     </h2>
                     <hr />
                     <div className='maintablesvincular'>
-                        <div style={{ flex: 0.8 }}>
-                            <Main>
-                                <h4>Itens</h4>
-                                <hr />
-                                <div style={{ paddingLeft: 20, paddingRight: 20 }}>
-                                    <ItemManutencaoTable
-                                        setSuperState={this.setSuperState}
-                                        data={this.props.dataTableItemManutencao} 
-                                    />
-                                </div>
-                            </Main>
-                        </div>
                         <div style={{ flex: 1 }}>
+                            <div style={{ paddingLeft: 20, paddingRight: 20 }}>
+                                <ItemManutencaoTable
+                                    setSuperState={this.setSuperState}
+                                    data={this.props.dataTableItemManutencao} 
+                                />
+                            </div>
+                        </div>
+                        {/* <div style={{ flex: 1 }}>
                             <Main>
                                 <h4>Veículos</h4>
                                 <hr />
@@ -93,11 +90,12 @@ class ItemManutencao extends Component {
                                 </div>
                             </Main>
 
-                        </div>
+                        </div> */}
                     </div>
                 </Main>
                 <div style={{ marginBottom: 50 }} />
                 <VincularModal />
+                <ItemManutencaoMdf />
             </div>
         );
     }

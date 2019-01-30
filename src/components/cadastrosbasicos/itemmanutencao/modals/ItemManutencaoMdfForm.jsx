@@ -1,15 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux';
 import { Field, reduxForm, change } from 'redux-form';
+import { required } from '../../../utils/validForms';
 
 import { store } from '../../../../index';
-import {
-    required
-} from '../../../utils/validForms';
+import { doPutItem } from '../ItemManutencaoActions';
 
-import { doPutItem } from '../CBArosActions';
-
-class CBArosMdfForm extends React.Component {   
+class ItemManutencaoMdfForm extends React.Component {
+    
     constructor(props) {
         super(props);
 
@@ -21,19 +19,14 @@ class CBArosMdfForm extends React.Component {
     onSubmitModifyForm(values) {
         const {
             id,
-            vehicletype,
-            aro
+            item,
+            itemabrev
         } = values;
-
-        if (!(vehicletype && aro)) {
-            alert('Para realizar a inclusão é necessário informar todos os campos.');
-            return;
-        }
 
         const params = {
             id,
-            vehicletype,
-            aro
+            item,
+            itemabrev
         };
 
         this.props.doPutItem(params, () => this.closeBtn);
@@ -41,14 +34,14 @@ class CBArosMdfForm extends React.Component {
 
     resetFields(reset) {
         const {
-            formValuesAros
+            formValues
         } = this.props;
 
         reset();
 
-        store.dispatch(change('cbarosmdfform', 'id', formValuesAros.id));
-        store.dispatch(change('cbarosmdfform', 'vehicletype', formValuesAros.vehicletype));
-        store.dispatch(change('cbarosmdfform', 'aro', formValuesAros.aro));
+        store.dispatch(change('itemmanutencaomdfform', 'id', formValues.id));
+        store.dispatch(change('itemmanutencaomdfform', 'itemabrev', formValues.itemabrev));
+        store.dispatch(change('itemmanutencaomdfform', 'item', formValues.item));
     }
 
     renderField({ input, label, type, meta: { touched, error, warning, submitFailed } }) {
@@ -80,26 +73,24 @@ class CBArosMdfForm extends React.Component {
                     </div>
                     <div className="col-12 col-md-4">
                         <div className="form-group">
-                            <label htmlFor="vehicletype">Tipo de Veículo *</label>
-                            <Field 
-                                component="select" 
-                                className="form-control" 
-                                name="vehicletype"
-                            >
-                                <option key={'1'} value={'1'}>Carro</option>
-                                <option key={'2'} value={'3'}>Caminhão</option>
-                                <option key={'3'} value={'2'}>Moto</option>
-                            </Field>
-                        </div>
-                    </div> 
-                    <div className="col-12 col-md-5">
-                        <div className="form-group">
-                            <label htmlFor="aro">Aro *</label>
+                            <label htmlFor="itemabrev">Nome Abreviado *</label>
                             <Field 
                                 component={this.renderField}
                                 type="text"
                                 className="form-control" 
-                                name="aro"
+                                name="itemabrev"
+                                validate={[ required ]}
+                            />
+                        </div>
+                    </div> 
+                    <div className="col-12 col-md-5">
+                        <div className="form-group">
+                            <label htmlFor="item">Item *</label>
+                            <Field 
+                                component={this.renderField}
+                                type="text"
+                                className="form-control" 
+                                name="item"
                                 validate={[ required ]}
                             />
                         </div>
@@ -144,20 +135,20 @@ class CBArosMdfForm extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    formValuesAros: state.CBArosReducer.formValuesAros,
+    formValues: state.ItemManutencaoReducer.formValues,
     initialValues: {
         id: '',
-        vehicletype: '1',
-        aro: ''
-    },
+        item: '',
+        itemabrev: ''
+    }
 });
 
-CBArosMdfForm = reduxForm({
-    form: 'cbarosmdfform',
+ItemManutencaoMdfForm = reduxForm({
+    form: 'itemmanutencaomdfform',
     destroyOnUnmount: false
-})(CBArosMdfForm); 
+})(ItemManutencaoMdfForm); 
 
 export default connect(mapStateToProps, {
     doPutItem
-})(CBArosMdfForm);
+})(ItemManutencaoMdfForm);
 

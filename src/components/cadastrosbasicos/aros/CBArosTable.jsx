@@ -48,8 +48,7 @@ class CBArosTable extends Component {
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
                 selected: [''],
-                selectedRow: {},
-                selectedIndex: -1
+                selectedRow: {}
             },
             dropdownBtnOpen: false
         }
@@ -67,13 +66,38 @@ class CBArosTable extends Component {
         });
     }
     
-    componentDidUpdate() {
-        const { data } = this.props;
+    componentDidUpdate(prevProps) {
+        const { data, refreshTableAros } = this.props;
+        const { selectedRow } = this.state.selectRow;
+        const indexFounded = _.findIndex(data, dt => dt.id === selectedRow.id);
+
+        let newSelectedRow = selectedRow;
 
         if( !data || data.length === 0) {
             store.dispatch({
                 type: 'modify_datatablecbarossub_cbaros',
                 payload: []
+            });
+        }
+
+
+        if (
+            refreshTableAros && 
+            indexFounded !== -1 &&
+            !_.isEqual(data[indexFounded], prevProps.data[indexFounded])
+        ) {
+            newSelectedRow = { ...data[indexFounded] };
+            store.dispatch({
+                type: 'modify_refreshtablearos_cbaros',
+                payload: false
+            });
+
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [newSelectedRow.id], 
+                    selectedRow: newSelectedRow
+                } 
             });
         }
     }
@@ -339,14 +363,17 @@ class CBArosTable extends Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [row.id], 
-                    selectedRow: row,
-                    selectedIndex: rowIndex
+                    selectedRow: row
                 } 
             });
             this.props.setSuperState({ selectedAroRowId: row.id });
             store.dispatch({
                 type: 'modify_arossubloading_cbaros',
                 payload: true
+            });
+            store.dispatch({
+                type: 'modify_arossubvalues_cbaros',
+                payload: row
             });
             
             this.props.doFetchCBArosSubs({ idaro: row.id });
@@ -355,14 +382,17 @@ class CBArosTable extends Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [''], 
-                    selectedRow: {},
-                    selectedIndex: -1
+                    selectedRow: {}
                 } 
             });
             this.props.setSuperState({ selectedAroRowId: '' });
             store.dispatch({
                 type: 'modify_arossubloading_cbaros',
                 payload: false
+            });
+            store.dispatch({
+                type: 'modify_arossubvalues_cbaros',
+                payload: {}
             });
         }
     }
@@ -561,6 +591,12 @@ class CBArosTable extends Component {
                                                     //filter={filterFactory()}
                                                     exportCsv
                                                     bootstrap4
+                                                    defaultSorted={
+                                                        [{
+                                                            dataField: 'id',
+                                                            order: 'desc'
+                                                        }]
+                                                    }
                                                 />
                                             </div>
                                         )
@@ -577,7 +613,8 @@ class CBArosTable extends Component {
     }
 }
 
-const mapStateToProps = () => ({
+const mapStateToProps = (state) => ({
+    refreshTableAros: state.CBArosReducer.refreshTableAros
 });
 
 setBinding({

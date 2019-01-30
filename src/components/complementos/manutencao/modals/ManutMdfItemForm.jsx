@@ -44,6 +44,7 @@ class ManutMdfItemForm extends React.Component {
         reset();
 
         store.dispatch(change('manutmdfitemform', 'id', formValues.id));
+        store.dispatch(change('manutmdfitemform', 'itemabrev', formValues.itemabrev));
         store.dispatch(change('manutmdfitemform', 'itemmanut', formValues.itemmanut));
         store.dispatch(change('manutmdfitemform', 'mes', formValues.mes));
         store.dispatch(change('manutmdfitemform', 'milhas', formValues.milhas));
@@ -70,15 +71,28 @@ class ManutMdfItemForm extends React.Component {
         return (
             <form onSubmit={handleSubmit(this.onSubmitModifyForm)}>
                 <div className='row'>
-                    <div className='col-12'>
+                    <div className='col-4'>
+                        <div className='form-group'>
+                            <label htmlFor='itemabrev'>Item Abreviação</label>
+                            <Field
+                                component={'input'}
+                                className='form-control' 
+                                name='itemabrev'
+                                disabled={true}
+                                value={FldValue}
+                            />
+                        </div>
+                    </div>
+                    <div className='col-8'>
                         <div className='form-group'>
                             <label htmlFor='itemmanut'>Item de Manutenção</label>
                             <Field
-                                component={'input'}
+                                component={'textarea'}
                                 className='form-control' 
                                 name='itemmanut'
                                 disabled={true}
                                 value={FldValue}
+                                rows={4}
                             />
                         </div>
                     </div>

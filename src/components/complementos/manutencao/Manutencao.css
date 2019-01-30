@@ -2,7 +2,7 @@
     margin: 0px;
     display: grid;
     grid-template-rows: max-content;
-    grid-template-columns: 40% auto;
+    grid-template-columns: 35% auto;
     grid-template-areas:
         "manutmaincad manutmaintable"; 
     background-color: rgb(255, 255, 255);

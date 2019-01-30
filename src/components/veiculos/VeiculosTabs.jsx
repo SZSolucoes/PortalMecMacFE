@@ -5,11 +5,10 @@ import Main from '../templates/Main';
 import './VeiculosTabs.css'
 import 'react-tabs/style/react-tabs.css';
 
-import CarTab from './CarTab';
-
 import imgCar from '../../assets/imgs/car.png';
 import imgTruck from '../../assets/imgs/truck.png';
 import imgBike from '../../assets/imgs/bike.png';
+import CarTab from './CarTab';
 import TruckTab from './TruckTab';
 import BikeTab from './BikeTab';
 import { store } from '../..';

@@ -25,6 +25,32 @@ export const doPostItem = (params, btnClick) => dispatch => {
     .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
 }
 
+export const doPutItem = (params, btnClose) => dispatch => {
+    Axios.put(`${BASEURL}aros`, params)
+    .then((res) => {
+        if (res && res.data) {
+            if (res.data.success === 'true') {
+                dispatch({
+                    type: 'modify_refreshtablearos_cbaros',
+                    payload: true
+                })
+                btnClose().click();
+                toastr.success('Sucesso', 'Modificação realizada com sucesso.');
+            } else {
+                const lowerMsg = res.data.message.toLowerCase();
+                if (lowerMsg.indexOf('duplicate') !== -1) {
+                    toastr.error('Erro', 'Registro já existe.');
+                    return;
+                }
+                if (res.data.success === 'false') {
+                    toastr.error('Erro', 'Falha ao modificar registro.');
+                }
+            }
+        }
+    })
+    .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
+}
+
 export const doPostArosCsvItens = (params) => dispatch => {
     Axios.post(`${BASEURL}arosbatch`, params)
     .then((res) => {
@@ -57,6 +83,32 @@ export const doPostItemSub = (params, btnClick) => dispatch => {
                 }
                 if (res.data.success === 'false') {
                     toastr.error('Erro', 'Falha ao inserir registro.');
+                }
+            }
+        }
+    })
+    .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
+}
+
+export const doPutItemSub = (params, btnClose) => dispatch => {
+    Axios.put(`${BASEURL}arossub`, params)
+    .then((res) => {
+        if (res && res.data) {
+            if (res.data.success === 'true') {
+                dispatch({
+                    type: 'modify_refreshtablearossub_cbaros',
+                    payload: true
+                })
+                btnClose().click();
+                toastr.success('Sucesso', 'Modificação realizada com sucesso.');
+            } else {
+                const lowerMsg = res.data.message.toLowerCase();
+                if (lowerMsg.indexOf('duplicate') !== -1) {
+                    toastr.error('Erro', 'Registro já existe.');
+                    return;
+                }
+                if (res.data.success === 'false') {
+                    toastr.error('Erro', 'Falha ao modificar registro.');
                 }
             }
         }

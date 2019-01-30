@@ -18,7 +18,13 @@ class ItemManutencaoTableForm extends React.Component {
     }
 
     onSubmitForm(values) {
-        this.props.doPostItem({ item: values.item }, this.buttonFecharRef);
+        this.props.doPostItem(
+            { 
+                item: values.item, 
+                itemabrev: values.itemabrev 
+            }, 
+            this.buttonFecharRef
+        );
     }
 
     renderField({ input, label, type, meta: { touched, error, warning, submitFailed } }) {
@@ -37,7 +43,7 @@ class ItemManutencaoTableForm extends React.Component {
                 <div className="form">
                     <div className="itemmanutencaodivtablebasic">
                         <div className="row">
-                            <div className="col-12 col-md-4">
+                            <div className="col-12 col-md-3">
                                 <div className="form-group">
                                     <label htmlFor="id">ID</label>
                                     <Field 
@@ -49,7 +55,19 @@ class ItemManutencaoTableForm extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <div className="col-12 col-md-8">
+                            <div className="col-12 col-md-4">
+                                <div className="form-group">
+                                    <label htmlFor="itemabrev">Nome Abreviado *</label>
+                                    <Field 
+                                        component={this.renderField}
+                                        type="text"
+                                        className="form-control" 
+                                        name="itemabrev"
+                                        validate={[ required ]}
+                                    />
+                                </div>
+                            </div> 
+                            <div className="col-12 col-md-5">
                                 <div className="form-group">
                                     <label htmlFor="item">Item *</label>
                                     <Field 
@@ -107,7 +125,8 @@ class ItemManutencaoTableForm extends React.Component {
 const mapStateToProps = (state) => ({
     initialValues: {
         id: '',
-        item: ''
+        item: '',
+        itemabrev: ''
     }
 });
 

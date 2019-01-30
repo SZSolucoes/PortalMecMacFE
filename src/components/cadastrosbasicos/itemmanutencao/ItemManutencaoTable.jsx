@@ -29,6 +29,7 @@ class ItemManutencaoTable extends Component {
         this.onDropCsv = this.onDropCsv.bind(this);
         this.onKeyUpOrDown = this.onKeyUpOrDown.bind(this);
         this.onClickIncluir = this.onClickIncluir.bind(this);
+        this.onClickModify = this.onClickModify.bind(this);
         this.onClickRemover = this.onClickRemover.bind(this);
         this.onClickImportCsv = this.onClickImportCsv.bind(this);
         this.onClickDropDownBtn = this.onClickDropDownBtn.bind(this);
@@ -70,13 +71,37 @@ class ItemManutencaoTable extends Component {
         });
     }
     
-    componentDidUpdate() {
-        const { data } = this.props;
+    componentDidUpdate(prevProps) {
+        const { data, refreshTable } = this.props;
+        const { selectedRow } = this.state.selectRow;
+        const indexFounded = _.findIndex(data, dt => dt.id === selectedRow.id);
+
+        let newSelectedRow = selectedRow;
 
         if( !data || data.length === 0) {
             store.dispatch({
                 type: 'modify_datatablevehicles_itemmanutencao',
                 payload: []
+            });
+        }
+
+        if (
+            refreshTable && 
+            indexFounded !== -1 &&
+            !_.isEqual(data[indexFounded], prevProps.data[indexFounded])
+        ) {
+            newSelectedRow = { ...data[indexFounded] };
+            store.dispatch({
+                type: 'modify_refreshtable_itemmanutencao',
+                payload: false
+            });
+
+            this.setState({ 
+                selectRow: { 
+                    ...this.state.selectRow, 
+                    selected: [newSelectedRow.id], 
+                    selectedRow: newSelectedRow
+                } 
             });
         }
     }
@@ -117,14 +142,18 @@ class ItemManutencaoTable extends Component {
                     data = [].concat.apply([], data);
                 
                     data = _.filter(data, row => {
-                        if (row.length !== 1) {
+                        if (row.length !== 2) {
                             return false;
                         }
 
                         for (let index = 0; index < row.length; index++) {
                             const element = row[index].toLowerCase().trim();
-                            if ('id|item|'.includes(element)) {
+                            if ('id|itemabrev|nome abreviado|nomeabreviado|item|'.includes(element)) {
                                 return false;
+                            }
+
+                            if (element === '' || element === 'undefined') {
+                                return false
                             }
                         }
 
@@ -170,6 +199,22 @@ class ItemManutencaoTable extends Component {
         this.itemManutencaotableBtnModalRef.click();
     }
 
+    onClickModify() {
+        if (this.state.selectRow.selected[0]) {
+            const { selectedRow } = this.state.selectRow;
+
+            store.dispatch(change('itemmanutencaomdfform', 'id', selectedRow.id));
+            store.dispatch(change('itemmanutencaomdfform', 'itemabrev', selectedRow.itemabrev));
+            store.dispatch(change('itemmanutencaomdfform', 'item', selectedRow.item));
+            store.dispatch({
+                type: 'modify_formvalues_itemmanutencao',
+                payload: selectedRow
+            });
+
+            this.arosMdfModalRef.click();
+        }
+    }
+
     onClickRemover() {
         if (this.state.selectRow.selected[0]) {
             this.props.modifyModalTitle('Remover');
@@ -206,14 +251,18 @@ class ItemManutencaoTable extends Component {
 
     handleCsvFile(data, name) {
         let newData = _.filter(data, row => {
-            if (row.length !== 1) {
+            if (row.length !== 2) {
                 return false;
             }
 
             for (let index = 0; index < row.length; index++) {
                 const element = row[index].toLowerCase().trim();
-                if ('id|item|'.includes(element)) {
+                if ('id|itemabrev|nome abreviado|nomeabreviado|item|'.includes(element)) {
                     return false;
+                }
+
+                if (element === '' || element === 'undefined') {
+                    return false
                 }
             }
 
@@ -319,6 +368,15 @@ class ItemManutencaoTable extends Component {
                 }), */
             }, 
             {
+                dataField: 'itemabrev',
+                text: 'Nome Abreviado',
+                sort: true
+                /* filter: textFilter({
+                    placeholder: ' ',
+                    delay: 0
+                }) */
+            },
+            {
                 dataField: 'item',
                 text: 'Item',
                 sort: true
@@ -368,6 +426,16 @@ class ItemManutencaoTable extends Component {
                                                             }}
                                                         >
                                                             Incluir
+                                                        </button>
+                                                        <button 
+                                                            className="btn btn-dark"
+                                                            onClick={() => this.onClickModify()}
+                                                            style={{ 
+                                                                marginRight: 10,
+                                                                marginTop: 5
+                                                            }}
+                                                        >
+                                                            Modificar
                                                         </button>
                                                         <button
                                                             ref={ref => (this.itemManutencaotableBtnModalRef = ref)}
@@ -431,6 +499,12 @@ class ItemManutencaoTable extends Component {
                                                             </CSVExport.ExportCSVButton>
                                                         </div>
                                                         {this.renderDropDownButton()}
+                                                        <button
+                                                            ref={ref => (this.arosMdfModalRef = ref)}
+                                                            hidden
+                                                            data-toggle="modal" data-target="#itemmanutencaomdf"
+                                                            data-backdrop="static" data-keyboard="false"
+                                                        />
                                                     </div>
                                                     <div 
                                                         style={{ 
@@ -446,6 +520,12 @@ class ItemManutencaoTable extends Component {
                                                     { ...props.baseProps } 
                                                     selectRow={this.state.selectRow}
                                                     pagination={paginationFactory()}
+                                                    defaultSorted={
+                                                        [{
+                                                            dataField: 'id',
+                                                            order: 'desc'
+                                                        }]
+                                                    }
                                                     bordered={ false }
                                                     striped
                                                     condensed
@@ -471,7 +551,8 @@ class ItemManutencaoTable extends Component {
 const mapStateToProps = (state) => ({
     listCarros: state.VeiculosReducer.listCarros,
     listMotos: state.VeiculosReducer.listMotos,
-    listCaminhoes: state.VeiculosReducer.listCaminhoes
+    listCaminhoes: state.VeiculosReducer.listCaminhoes,
+    refreshTable: state.ItemManutencaoReducer.refreshTable
 });
 
 setBinding({

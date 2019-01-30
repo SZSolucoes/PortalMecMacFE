@@ -31,8 +31,7 @@ class ManutencaoTable extends Component {
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
                 selected: [''],
-                selectedRow: {},
-                selectedIndex: -1
+                selectedRow: {}
             }
         };
     }
@@ -46,16 +45,18 @@ class ManutencaoTable extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        const { selectedIndex, selectedRow } = this.state.selectRow;
+        const { itemsAro, refreshTable } = this.props;
+        const { selectedRow } = this.state.selectRow;
+        const indexFounded = _.findIndex(itemsAro, ita => ita.id === selectedRow.id);
+
         let newSelectedRow = selectedRow;
 
         if (
-            this.props.refreshTable && 
-            selectedIndex > -1 && 
-            (this.props.itemsAro.length - 1) >= selectedIndex &&
-            !_.isEqual(this.props.itemsAro[selectedIndex], prevProps.itemsAro[selectedIndex])
+            refreshTable && 
+            indexFounded !== -1 &&
+            !_.isEqual(itemsAro[indexFounded], prevProps.itemsAro[indexFounded])
         ) {
-            newSelectedRow = { ...this.props.itemsAro[selectedIndex] };
+            newSelectedRow = { ...itemsAro[indexFounded] };
             store.dispatch({
                 type: 'modify_refreshtable_aros',
                 payload: false
@@ -109,8 +110,7 @@ class ManutencaoTable extends Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [row.id], 
-                    selectedRow: row,
-                    selectedIndex: rowIndex
+                    selectedRow: row
                 }
             });
             this.props.onSuperChangeState({
@@ -122,8 +122,7 @@ class ManutencaoTable extends Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [''], 
-                    selectedRow: {},
-                    selectedIndex: -1 
+                    selectedRow: {}
                 },
             });
         }
@@ -237,6 +236,12 @@ class ManutencaoTable extends Component {
                                     //filter={filterFactory()}
                                     exportCsv
                                     bootstrap4
+                                    defaultSorted={
+                                        [{
+                                            dataField: 'id',
+                                            order: 'desc'
+                                        }]
+                                    }
                                 />
                             </div>
                         )

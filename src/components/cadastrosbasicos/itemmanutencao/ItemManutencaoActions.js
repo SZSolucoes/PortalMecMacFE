@@ -16,6 +16,36 @@ export const doPostItem = (params, btnClick) => dispatch => {
                 if (lowerMsg.indexOf('duplicate') !== -1) {
                     toastr.error('Erro', 'Registro já existe.');
                 }
+
+                if (res.data.success === 'false') {
+                    toastr.error('Erro', 'Falha ao incluir item.');
+                }
+            }
+        }
+    })
+    .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
+}
+
+export const doPutItem = (params, btnClose) => dispatch => {
+    Axios.put(`${BASEURL}itemmanutencao`, params)
+    .then((res) => {
+        if (res && res.data) {
+            if (res.data.success === 'true') {
+                dispatch({
+                    type: 'modify_refreshtable_itemmanutencao',
+                    payload: true
+                });
+                btnClose().click();
+                toastr.success('Sucesso', 'Modificação realizada com sucesso.');
+            } else {
+                const lowerMsg = res.data.message.toLowerCase();
+                if (lowerMsg.indexOf('duplicate') !== -1) {
+                    toastr.error('Erro', 'Registro já existe.');
+                }
+
+                if (res.data.success === 'false') {
+                    toastr.error('Erro', 'Falha ao modificar item.');
+                }
             }
         }
     })

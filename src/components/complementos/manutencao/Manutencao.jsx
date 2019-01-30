@@ -23,7 +23,7 @@ class Manutencao extends React.Component {
     onClickAdicionar() {
         const formValues = getFormValues('manutencao')(store.getState());
         const vehicle = { ...this.props.item };
-        if (typeof vehicle === 'object' && Object.keys(vehicle).length && formValues.itemmanut) {
+        if (typeof vehicle === 'object' && Object.keys(vehicle).length && formValues.iditemmanut) {
             if (vehicle.vehicletype) {
                 let keyTable = {};
                 if (vehicle.vehicletype === '1') {
@@ -35,7 +35,7 @@ class Manutencao extends React.Component {
                 }
 
                 this.props.doPostManutencao({
-                    itemmanut: formValues.itemmanut,
+                    iditemmanut: formValues.iditemmanut,
                     mes: formValues.mes,
                     milhas: formValues.milhas,
                     quilometros: formValues.km,
@@ -66,16 +66,29 @@ class Manutencao extends React.Component {
                         <div className='row'>
                             <div className='col-12'>
                                 <div className='form-group'>
-                                    <label htmlFor='itemmanut'>Itens de Manutenção</label>
+                                    <label htmlFor='iditemmanut'>Itens de Manutenção</label>
                                     <Field 
                                         component="select" 
                                         className="form-control" 
-                                        name="itemmanut"
+                                        name="iditemmanut"
                                         //onChange={event => this.consultarFipe(event, 'fipeperiodoref')}
                                     >
                                         {
-                                             this.props.itemManutencaoCombo.map((value, index) => 
-                                                <option key={index} value={value.item}>{value.item}</option>
+                                             this.props.itemManutencaoCombo.map((value, index) => {
+                                                 if (value.itemabrev) {
+                                                    return (
+                                                        <option 
+                                                            key={index} 
+                                                            value={value.itemmanutid}
+                                                        >
+                                                            {value.itemabrev}
+                                                        </option>
+                                                    );
+                                                 }
+
+                                                 return null;
+                                             }
+                                                
                                             )
                                         }
                                     </Field>
@@ -166,7 +179,7 @@ const mapStateToProps = (state) => ({
     itemManutencaoCombo: state.ManutencaoReducer.itemManutencaoCombo,
     dataTableManutencao: state.ManutencaoReducer.dataTableManutencao,
     initialValues: {
-        itemmanut: '',
+        iditemmanut: '',
         mes: '',
         milhas: '',
         km: '',

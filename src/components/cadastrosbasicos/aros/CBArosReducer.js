@@ -3,7 +3,10 @@ const INITIAL_STATE = {
     dataTableCBArosSub: [],
     arosSubLoading: false,
     arosSubValues: {},
-    formValuesAros: {}
+    formValuesAros: {},
+    formValuesArosSub: {},
+    refreshTableAros: false,
+    refreshTableArosSub: false
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -33,6 +36,21 @@ export default (state = INITIAL_STATE, action) => {
                 ...state,
                 formValuesAros: { ...action.payload }
         };
+        case 'modify_formvaluesarossub_cbaros':
+            return {
+                ...state,
+                formValuesArosSub: { ...action.payload }
+        };
+        case 'modify_refreshtablearos_cbaros':
+            return {
+                ...state,
+                refreshTableAros: action.payload
+        };
+        case 'modify_refreshtablearossub_cbaros':
+            return {
+                ...state,
+                refreshTableArosSub: action.payload
+        };
         case 'modify_clean_cbaros':
             return {
                 ...state,
@@ -40,7 +58,10 @@ export default (state = INITIAL_STATE, action) => {
                 dataTableCBArosSub: [],
                 arosSubLoading: false,
                 arosSubValues: {},
-                formValuesAros: {}
+                formValuesAros: {},
+                formValuesArosSub: {},
+                refreshTableAros: false,
+                refreshTableArosSub: false
             };
         default:
             return state;

@@ -1,7 +1,9 @@
 const INITIAL_STATE = {
     dataTableItemManutencao: [],
     dataTableVehicles: [],
-    vehiclesLoading: false
+    vehiclesLoading: false,
+    formValues: {},
+    refreshTable: false
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -21,12 +23,24 @@ export default (state = INITIAL_STATE, action) => {
                 ...state,
                 vehiclesLoading: action.payload
         };
+        case 'modify_formvalues_itemmanutencao':
+            return {
+                ...state,
+                formValues: { ...action.payload }
+        };
+        case 'modify_refreshtable_itemmanutencao':
+            return {
+                ...state,
+                refreshTable: { ...action.payload }
+        };
         case 'modify_clean_itemmanutencao':
             return {
                 ...state,
                 dataTableItemManutencao: [],
                 dataTableVehicles: [],
-                vehiclesLoading: false
+                vehiclesLoading: false,
+                formValues: {},
+                refreshTable: false
             };
         default:
             return state;

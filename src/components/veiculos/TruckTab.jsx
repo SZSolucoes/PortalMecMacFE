@@ -6,6 +6,7 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../utils/UtilsActions';
 import { withRouter } from 'react-router-dom';
+import _ from 'lodash';
 
 import {
     doOpenVeiculoModal
@@ -36,18 +37,20 @@ class TruckTab extends React.Component {
                 style: { color: 'white' },
                 onSelect: this.handleOnSelect,
                 selected: [''],
-                selectedRow: {},
-                selectedIndex: -1
+                selectedRow: {}
             }
         };
     }
 
     componentDidUpdate() {
-        const { selectedIndex, selectedRow } = this.state.selectRow;
+        const { listCaminhoes } = this.props;
+        const { selectedRow } = this.state.selectRow;
+        const indexFounded = _.findIndex(listCaminhoes, trk => trk.recrow === selectedRow.recrow);
+        
         let newSelectedRow = selectedRow;
 
-        if (selectedIndex > -1 && (this.props.listCaminhoes.length - 1) >= selectedIndex) {
-            newSelectedRow = { ...this.props.listCaminhoes[selectedIndex] };
+        if (indexFounded !== -1) {
+            newSelectedRow = { ...listCaminhoes[indexFounded] };
         }
 
         if (this.props.isRefreshTabTruck) {
@@ -55,7 +58,7 @@ class TruckTab extends React.Component {
                 type: 'modify_isrefreshtabtruck_veiculos',
                 payload: false
             });
-
+            
             this.setState({ 
                 selectRow: { 
                     ...this.state.selectRow, 
@@ -122,8 +125,7 @@ class TruckTab extends React.Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [row.id], 
-                    selectedRow: row,
-                    selectedIndex: rowIndex
+                    selectedRow: row
                 } 
             });
         } else {
@@ -131,16 +133,22 @@ class TruckTab extends React.Component {
                 selectRow: { 
                     ...this.state.selectRow, 
                     selected: [''], 
-                    selectedRow: {},
-                    selectedIndex: -1 
+                    selectedRow: {}
                 }
             });
         }
     }
 
     render() {
-        const dataTable = this.props.listCaminhoes || [];
+        let dataTable = this.props.listCaminhoes || [];
+
         const columnsTable = [
+            {
+                dataField: 'recrow',
+                text: 'recrow',
+                hidden: true,
+                csvExport: false
+            }, 
             {
                 dataField: 'id',
                 text: 'id',
@@ -335,7 +343,6 @@ class TruckTab extends React.Component {
                                     </div>
                                 </div>
                                 <BootstrapTable
-                                    
                                     { ...props.baseProps } 
                                     selectRow={this.state.selectRow}
                                     pagination={paginationFactory()}
@@ -344,6 +351,12 @@ class TruckTab extends React.Component {
                                     filter={filterFactory()}
                                     exportCsv
                                     bootstrap4
+                                    defaultSorted={
+                                        [{
+                                            dataField: 'recrow',
+                                            order: 'desc'
+                                        }]
+                                    }
                                 />
                             </div>
                         )

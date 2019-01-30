@@ -10,6 +10,7 @@ import { doGetDataTableCBAros } from './CBArosActions';
 import CBArosMdf from './modals/CBArosMdf';
 
 import './CBAros.css';
+import CBArosSubMdf from './modals/CBArosSubMdf';
 
 class CBAros extends Component {
 
@@ -99,6 +100,7 @@ class CBAros extends Component {
                 </Main>
                 <div style={{ marginBottom: 50 }} />
                 <CBArosMdf />
+                <CBArosSubMdf />
             </div>
         );
     }

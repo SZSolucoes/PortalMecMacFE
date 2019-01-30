@@ -29,13 +29,17 @@ class CPManualTable extends Component {
 
         this.columnsTable = [
             {
+                dataField: 'recrow',
+                text: 'recrow',
+                hidden: true,
+            }, 
+            {
                 dataField: 'id',
                 text: 'id',
                 hidden: true,
                 formatter: (cell, row, rowIndex, formatExtraData) => {
                     return `${row.fipemesano.trim()}|${row.marca.trim()}|${row.modelo.trim()}|${row.ano.trim()}`;
                 }
-                
             }, 
             {
                 dataField: 'fipeperiodoref',
@@ -342,7 +346,6 @@ class CPManualTable extends Component {
                                     </div>
                                 </div>
                                 <BootstrapTable
-                                    
                                     { ...props.baseProps } 
                                     selectRow={this.state.selectRow}
                                     pagination={paginationFactory()}
@@ -352,6 +355,12 @@ class CPManualTable extends Component {
                                     wrapperClasses="cpmanualtable"
                                     filter={filterFactory()}
                                     bootstrap4
+                                    defaultSorted={
+                                        [{
+                                            dataField: 'recrow',
+                                            order: 'desc'
+                                        }]
+                                    }
                                 />
                             </div>
                         )
