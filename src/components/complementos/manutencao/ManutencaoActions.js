@@ -30,10 +30,36 @@ export const doPostManutencao = (params) => dispatch => {
                     const lowerMsg = res.data.message.toLowerCase();
                     if (lowerMsg.indexOf('duplicate') !== -1) {
                         toastr.error('Erro', 'Registro já cadastrado.');
+                        return;
                     }
 
                     if (res.data.success === 'false') {
-                        toastr.error('Erro', res.data.message);
+                        toastr.error('Erro', 'Falha ao incluir item de manutenção.');
+                    }
+                }
+            }
+        })
+        .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'));
+}
+
+export const doPostManutencaoLote = (params, cleanLoteState) => dispatch => {
+    Axios.post(`${BASEURL}manutencaolote`, params)
+        .then(res => {
+            if (res && res.data) {
+                if (res.data.success === 'true') {
+                    if (cleanLoteState) {
+                        cleanLoteState();
+                    }
+                    toastr.success('Sucesso', 'Adição realizada com sucesso.');
+                } else {
+                    const lowerMsg = res.data.message.toLowerCase();
+                    if (lowerMsg.indexOf('duplicate') !== -1) {
+                        toastr.error('Erro', 'Registro já cadastrado.');
+                        return;
+                    }
+
+                    if (res.data.success === 'false') {
+                        toastr.error('Erro', 'Falha ao incluir item de manutenção.');
                     }
                 }
             }
@@ -64,6 +90,22 @@ export const doPutManutencao = (params, closeModalBtn) => dispatch => {
             }
         })
         .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'));
+}
+
+export const doPutVehicleComp = (params) => dispatch => {
+    Axios.put(`${BASEURL}veiculoscomp`, params)
+    .then(res => {
+        if (res && res.data) {
+            if (res.data.success === 'true') {
+                toastr.success('Sucesso', 'Salvo com sucesso.');
+            } else {
+                toastr.error('Erro', 'Falha ao salvar link.');
+            }
+        }
+    })
+    .catch(() => {
+        toastr.error('Erro', 'Falha de comunicação com o servidor.');
+    });
 }
 
 export const doDeleteManutencao = (id) => dispatch => {

@@ -21,7 +21,9 @@ export const doConfirmVincular = (params, btnCloseModal) => async dispatch => {
                         type: 'modify_overlaymodal_vincularitemmanut',
                         payload: false
                     });
-                    setTimeout(() => btnCloseModal.click(), 500);
+                    if (btnCloseModal) {
+                        setTimeout(() => btnCloseModal.click(), 500);
+                    }
                     setTimeout(() => toastr.success('Sucesso', res.data.message), 1000);
                     return true;
                 } else {

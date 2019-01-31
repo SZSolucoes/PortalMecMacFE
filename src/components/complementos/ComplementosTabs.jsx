@@ -247,7 +247,7 @@ class ComplementosTabs extends React.Component {
                     </Main>
                 </div>
                 <Main>
-                    <Tabs>
+                    <Tabs forceRenderTabPanel>
                         <TabList>
                             <Tab style={{ paddingLeft: 30, paddingRight: 30, paddingTop: 15 }}>
                                 <h6 style={{ alignSelf: 'flex-end' }}><b>Manutenção</b></h6>

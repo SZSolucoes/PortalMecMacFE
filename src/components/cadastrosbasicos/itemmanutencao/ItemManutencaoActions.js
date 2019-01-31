@@ -15,6 +15,7 @@ export const doPostItem = (params, btnClick) => dispatch => {
                 const lowerMsg = res.data.message.toLowerCase();
                 if (lowerMsg.indexOf('duplicate') !== -1) {
                     toastr.error('Erro', 'Registro já existe.');
+                    return;
                 }
 
                 if (res.data.success === 'false') {
@@ -41,6 +42,7 @@ export const doPutItem = (params, btnClose) => dispatch => {
                 const lowerMsg = res.data.message.toLowerCase();
                 if (lowerMsg.indexOf('duplicate') !== -1) {
                     toastr.error('Erro', 'Registro já existe.');
+                    return;
                 }
 
                 if (res.data.success === 'false') {
@@ -62,6 +64,11 @@ export const doPostCsvItens = (params) => dispatch => {
                 const lowerMsg = res.data.message.toLowerCase();
                 if (lowerMsg.indexOf('duplicate') !== -1) {
                     toastr.error('Erro', 'Registro já existe.');
+                    return;
+                }
+
+                if (res.data.success === 'false') {
+                    toastr.error('Erro', 'Falha ao incluir registro.');
                 }
             }
         }

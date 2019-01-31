@@ -8,9 +8,10 @@ import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, {  Search } from 'react-bootstrap-table2-toolkit';
 
+import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../../utils/UtilsActions';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css"
 
-class VincularTable extends Component {
+class VincularTableItens extends Component {
     constructor(props) {
         super(props);
 
@@ -26,65 +27,29 @@ class VincularTable extends Component {
         this.columnsTable = [
             {
                 dataField: 'id',
-                text: 'id',
-                hidden: true,
-                formatter: (cell, row, rowIndex, formatExtraData) => {
-                    return `${row.fipemesano.trim()}|${row.marca.trim()}|${row.modelo.trim()}|${row.ano.trim()}`;
-                }
-                
-            }, 
-            {
-                dataField: 'fipeperiodoref',
-                text: 'Fipe Mês/Ano',
+                text: 'ID',
                 sort: true,
-                headerStyle: { textAlign: 'left', whiteSpace: 'nowrap' },
-                style: { textAlign: 'left' },
+                csvExport: false,
                 filter: textFilter({
-                    placeholder: 'Filtrar...',
+                    placeholder: ' ',
                     delay: 0
                 })
             }, 
             {
-                dataField: 'marca',
-                text: 'Marca',
+                dataField: 'itemabrev',
+                text: 'Nome Abreviado',
                 sort: true,
-                headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left' },
                 filter: textFilter({
-                    placeholder: 'Filtrar...',
+                    placeholder: ' ',
                     delay: 0
                 })
-            }, 
+            },
             {
-                dataField: 'modelo',
-                text: 'Modelo',
+                dataField: 'item',
+                text: 'Item',
                 sort: true,
-                headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left' },
                 filter: textFilter({
-                    placeholder: 'Filtrar...',
-                    delay: 0
-                })
-            }, 
-            {
-                dataField: 'ano',
-                text: 'Ano',
-                sort: true,
-                headerStyle: { textAlign: 'center' },
-                style: { textAlign: 'center' },
-                filter: textFilter({
-                    placeholder: 'Filtrar...',
-                    delay: 0
-                })
-            }, 
-            {
-                dataField: 'combustivel',
-                text: 'Combustível',
-                sort: true,
-                headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left' },
-                filter: textFilter({
-                    placeholder: 'Filtrar...',
+                    placeholder: ' ',
                     delay: 0
                 })
             }
@@ -128,7 +93,7 @@ class VincularTable extends Component {
            data.values = [...selectRow.selected];
            return data;
         } else {
-            alert('Não foram selecionados veículos para o vínculo.');
+            alert('Não foram selecionados itens de manutenção para o vínculo.');
             return data;
         }
     }
@@ -226,9 +191,9 @@ class VincularTable extends Component {
     }
 
     render() {
-        const { listCarros, listMotos, listCaminhoes } = this.props;
+        const { dataTableItemManutencao } = this.props;
 
-        let dataTable = [...listCarros, ...listMotos, ...listCaminhoes];
+        let dataTable = [...dataTableItemManutencao];
 
         if (this.state.selectRow.selected[0] !== '' && this.state.showallseleted) {
             dataTable = _.filter(dataTable, (item) => {
@@ -263,15 +228,15 @@ class VincularTable extends Component {
                                         <div className="form-check">
                                             <input 
                                                 type="checkbox" 
-                                                name= "showallseleted" 
+                                                name= "showallseleteditens" 
                                                 className="form-check-input" 
-                                                id="showallseleted"
+                                                id="showallseleteditens"
                                                 checked={this.state.showallseleted}
                                                 onChange={() => this.setState({ 
                                                     showallseleted: !this.state.showallseleted 
                                                 })}
                                             />
-                                            <label className="form-check-label" htmlFor="showallseleted">
+                                            <label className="form-check-label" htmlFor="showallseleteditens">
                                                 {' Mostrar somente os selecionados'}
                                             </label>
                                         </div>
@@ -299,17 +264,15 @@ class VincularTable extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    listCarros: state.VeiculosReducer.listCarros,
-    listMotos: state.VeiculosReducer.listMotos,
-    listCaminhoes: state.VeiculosReducer.listCaminhoes
+    dataTableItemManutencao: state.ItemManutencaoReducer.dataTableItemManutencao
 });
 
 setBinding({
-    target: VincularTable.prototype,
-    fn: VincularTable.prototype.onKeyUpOrDown,
+    target: VincularTableItens.prototype,
+    fn: VincularTableItens.prototype.onKeyUpOrDown,
     keys: [ /*KeyDownKeys.UP, KeyDownKeys.DOWN*/ ]
 });
 
 export default connect(mapStateToProps, {
-}, null, { withRef: true })(VincularTable);
+}, null, { withRef: true })(VincularTableItens);
 

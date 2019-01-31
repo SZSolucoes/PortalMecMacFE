@@ -240,13 +240,7 @@ class ItemManutencaoTable extends Component {
     }
 
     onClickVincular() {
-        if (this.state.selectRow.selected[0]) {
-            store.dispatch({
-                type: 'modify_item_vincularitemmanut',
-                payload: this.state.selectRow.selected[0]
-            });
-            this.selectVehicleModal.click();
-        }
+        this.selectVehicleModal.click();
     }
 
     handleCsvFile(data, name) {

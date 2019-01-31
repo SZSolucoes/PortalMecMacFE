@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { change } from 'redux-form';
 import Main from '../../templates/Main';
 import ItemManutencaoTable from './ItemManutencaoTable';
-import ItemManutencaoTableV from './ItemManutencaoTableV';
+//import ItemManutencaoTableV from './ItemManutencaoTableV';
 import { socket } from '../../../main/App';
 import { store } from '../../../index';
 import { doGetDataTableItemManutencao } from './ItemManutencaoActions';

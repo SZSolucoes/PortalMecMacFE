@@ -9,7 +9,8 @@ import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 
 import {
-    doOpenVeiculoModal
+    doOpenVeiculoModal,
+    refreshVehicle
 } from '../cadastroveiculo/CadastroVeiculoActions';
 import { modifyComplementosItem } from '../complementos/ComplementosActions';
 import { modifyCPManualItem } from './cpmanual/CPManualActions';
@@ -40,6 +41,10 @@ class TruckTab extends React.Component {
                 selectedRow: {}
             }
         };
+    }
+
+    componentDidMount() {
+        refreshVehicle('3');
     }
 
     componentDidUpdate() {

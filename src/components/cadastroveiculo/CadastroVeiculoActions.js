@@ -149,6 +149,11 @@ const onPostVeiculoSuccess = (dispatch, res, params, funCleanModal) => {
             const lowerMsg = res.data.message.toLowerCase();
             if (lowerMsg.indexOf('duplicate') !== -1) {
                 toastr.error('Erro', 'Veículo já cadastrado.');
+                return;
+            }
+
+            if (res.data.success === 'false') {
+                toastr.error('Erro', 'Falha ao incluir registro.');
             }
         }
     }
@@ -215,7 +220,7 @@ const onPutVeiculoSuccess = (dispatch, res, params, funCleanCloseModal) => {
     }
 };
 
-const refreshVehicle = (vehicletype, params) => {
+export const refreshVehicle = (vehicletype, params) => {
     const asyncFunExec = async () => {
         const veiculo = await doFetchVehicle({ vehicletype });
         if (veiculo && veiculo.success) {

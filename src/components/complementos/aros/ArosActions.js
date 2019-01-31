@@ -30,6 +30,11 @@ export const doPostCompAros = (params) => dispatch => {
                     const lowerMsg = res.data.message.toLowerCase();
                     if (lowerMsg.indexOf('duplicate') !== -1) {
                         toastr.error('Erro', 'Registro já cadastrado.');
+                        return;
+                    }
+
+                    if (res.data.success === 'false') {
+                        toastr.error('Erro', 'Falha ao incluir registro.');
                     }
                 }
             }

@@ -6,8 +6,8 @@ import '../../../node_modules/react-redux-toastr/lib/css/react-redux-toastr.min.
 export default props => (
     <ReduxToastr
         timeOut={4000}
-        newestOnTop={false}
-        preventDuplicates={true}
+        newestOnTop
+        preventDuplicates={false}
         position='top-right'
         transitionIn='fadeIn'
         transitionOut='fadeOut'
