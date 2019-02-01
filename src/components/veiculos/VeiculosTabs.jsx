@@ -5,8 +5,6 @@ import Main from '../templates/Main';
 import './VeiculosTabs.css'
 import 'react-tabs/style/react-tabs.css';
 
-import { socket } from '../../main/App';
-import { refreshVehicle } from '../cadastroveiculo/CadastroVeiculoActions';
 import imgCar from '../../assets/imgs/car.png';
 import imgTruck from '../../assets/imgs/truck.png';
 import imgBike from '../../assets/imgs/bike.png';
@@ -16,18 +14,6 @@ import BikeTab from './BikeTab';
 import { store } from '../..';
 
 class VeiculosTabs extends React.Component {
-    componentDidMount() {
-        socket.on('table_veiculos_changed', data => {
-            if (data) {
-                refreshVehicle(data.toString());
-            }
-        });
-    }
-
-    componentWillUnmount() {
-        socket.off('table_veiculos_changed');
-    }
-
     render() {
         return (
             <Main>
@@ -39,6 +25,7 @@ class VeiculosTabs extends React.Component {
                             payload: index
                         })
                     }}
+                    forceRenderTabPanel
                 >
                     <TabList>
                         <Tab>

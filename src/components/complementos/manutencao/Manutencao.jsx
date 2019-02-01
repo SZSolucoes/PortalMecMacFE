@@ -359,7 +359,7 @@ class Manutencao extends React.Component {
                                         key: this.state.loterows.length,
                                         mes: '',
                                         milhas: '',
-                                        km: ''
+                                        quilometros: ''
                                     }
                                 ]
                             })}
@@ -372,11 +372,13 @@ class Manutencao extends React.Component {
                             className='btn btn-sm btn-danger btn-block'
                             type='button'
                             onClick={() => {
-                                const newLote = [...this.state.loterows];
-                                newLote.splice(this.state.loterows.length - 1, 1);
-                                this.setState({
-                                    loterows: newLote
-                                })
+                                if (this.state.loterows.length > 1) {
+                                    const newLote = [...this.state.loterows];
+                                    newLote.splice(this.state.loterows.length - 1, 1);
+                                    this.setState({
+                                        loterows: newLote
+                                    });
+                                }
                             }}
                         >
                             Menos
@@ -392,7 +394,7 @@ class Manutencao extends React.Component {
                                         key: 0,
                                         mes: '',
                                         milhas: '',
-                                        km: ''
+                                        quilometros: ''
                                     }
                                 ]
                             })}

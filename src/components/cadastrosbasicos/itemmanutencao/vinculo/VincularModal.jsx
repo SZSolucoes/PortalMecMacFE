@@ -1,11 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux';
 import LoadingOverlay from 'react-loading-overlay';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import _ from 'lodash';
 import 'react-tabs/style/react-tabs.css';
 
 import './Vincular.css';
 import VincularTable from './VincularTable';
 import VincularTableItens from './VincularTableItens';
+import VincularTableGerenc from './VincularTableGerenc';
 import Main from '../../../templates/Main';
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../../utils/UtilsActions';
 
@@ -14,12 +17,39 @@ class VincularModal extends React.Component {
     constructor(props) {
         super(props);
 
-        this.renderBody = this.renderBody.bind(this);
-        this.onClickConfirm = this.onClickConfirm.bind(this);
-        this.onClickFechar = this.onClickFechar.bind(this);
+        this.renderBodyLote = this.renderBodyLote.bind(this);
+        this.onClickConfirmLote = this.onClickConfirmLote.bind(this);
+        this.onClickFecharLote = this.onClickFecharLote.bind(this);
+
+        this.renderBodyGerenc = this.renderBodyGerenc.bind(this);
+        this.onClickFecharGerenc = this.onClickFecharGerenc.bind(this);
+
+        this.state = {
+            itemmanutcombo: 0
+        }
     }
 
-    onClickConfirm() {
+    componentDidMount() {
+        const { dataTableItemManutencao } = this.props;
+
+        if (dataTableItemManutencao.length) {
+            this.setState({
+                itemmanutcombo: dataTableItemManutencao[0].id
+            });
+        }
+    }
+
+    componentDidUpdate() {
+        const { dataTableItemManutencao } = this.props;
+
+        if (this.state.itemmanutcombo === 0 && dataTableItemManutencao.length) {
+            this.setState({
+                itemmanutcombo: dataTableItemManutencao[0].id
+            });
+        }
+    }
+
+    onClickConfirmLote() {
         const retItens = this.VincularTableItensRef.getWrappedInstance().onClickConfirm();
 
         if (!retItens.success) return
@@ -34,42 +64,55 @@ class VincularModal extends React.Component {
         );
 
         const params = {
-            itens: retItens,
-            veiculos: retVeiculos
+            itens: retItens.values,
+            veiculos: retVeiculos.values
         };
 
         this.props.modifyExtraData({ 
             params, 
             action: 'confirm_vincularitemmanut',
-            btnCloseModal: this.props.btnCloseModal
+            btnCloseModal: { click: this.onClickFecharLote }
         });
         
         this.confirmVincularBtnRef.click();
     }
 
-    onClickFechar() {
+    onClickFecharLote() {
         this.VincularTableItensRef.getWrappedInstance().onClickFechar();
         this.VincularTableRef.getWrappedInstance().onClickFechar();
     }
 
-    renderBody() {
+    onClickFecharGerenc() {
+        this.VincularTableGerencVeicRef.getWrappedInstance().onClickFechar();
+    }
+
+    renderBodyLote() {
         return (
             <div id='vincularmain' className='d-flex flex-row'>
                 <Main>
                     <h4>Itens de manutenção</h4>
                     <VincularTableItens
                         ref={ref => (this.VincularTableItensRef = ref)}
-                        btnCloseModal={this.buttonFecharRef}
+                        btnCloseModal={this.buttonFecharLoteRef}
                     />
                 </Main>
                 <Main>
                     <h4>Veículos</h4>
                     <VincularTable 
                         ref={ref => (this.VincularTableRef = ref)}
-                        btnCloseModal={this.buttonFecharRef}
+                        btnCloseModal={this.buttonFecharLoteRef}
                     />
                 </Main>
             </div>
+        );
+    }
+
+    renderBodyGerenc() {
+        return (    
+            <VincularTableGerenc
+                ref={ref => (this.VincularTableGerencVeicRef = ref)}
+                btnCloseModal={this.buttonFecharLoteRef}
+            /> 
         );
     }
 
@@ -102,26 +145,102 @@ class VincularModal extends React.Component {
                                 <div className="modal-body">
                                     <React.Fragment>
                                         <div className="">
-                                            {this.renderBody()}
-                                            <div className="row">
-                                                <div className="col-12 modal-footer d-flex justify-content-end">
-                                                    <button 
-                                                        className="btn btn-primary"
-                                                        type="button"
-                                                        onClick={() =>  this.onClickConfirm()}
+                                            <Tabs forceRenderTabPanel>
+                                                <TabList>
+                                                    <Tab style={{ paddingLeft: 30, paddingRight: 30, paddingTop: 15 }}>
+                                                        <h6 style={{ alignSelf: 'flex-end' }}><b>Gerenciado</b></h6>
+                                                    </Tab>
+                                                    <Tab style={{ paddingLeft: 30, paddingRight: 30, paddingTop: 15 }}>
+                                                        <h6 style={{ alignSelf: 'flex-end' }}><b>Em Lote</b></h6>
+                                                    </Tab>
+                                                </TabList>
+                                                <TabPanel>
+                                                    <div 
+                                                        className="row col-12 d-flex justify-content-start"
                                                     >
-                                                        Confirmar
-                                                    </button>
-                                                    <button
-                                                        ref={ref => (this.buttonFecharRef = ref)} 
-                                                        type="button" 
-                                                        className="btn btn-secondary"
-                                                        onClick={() => this.onClickFechar()}
-                                                        data-dismiss="modal">
-                                                        Fechar
-                                                    </button>
-                                                </div>
-                                            </div>
+                                                        <div className='form-group col-4'>
+                                                            <label htmlFor='itemmanutcombo'>Item Manutenção</label>
+                                                            <select
+                                                                className="form-control" 
+                                                                name="itemmanutcombo"
+                                                                value={this.state.itemmanutcombo}
+                                                                onChange={event => 
+                                                                    this.setState({ 
+                                                                        itemmanutcombo: event.target.value 
+                                                                    })
+                                                                }
+                                                            >
+                                                                {
+                                                                    _.map(
+                                                                        this.props.dataTableItemManutencao, 
+                                                                        (dt, index) => {
+                                                                            return (
+                                                                                <option 
+                                                                                    key={index} 
+                                                                                    value={dt.id}
+                                                                                >
+                                                                                    {dt.itemabrev}
+                                                                                </option>
+                                                                            );
+                                                                        }
+                                                                    )
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div
+                                                            className='buttonmove'
+                                                        >
+                                                            <button 
+                                                                className="btn btn-primary"
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    this
+                                                                    .VincularTableGerencVeicRef
+                                                                    .getWrappedInstance()
+                                                                    .onClickVincItem(this.state.itemmanutcombo)
+                                                                }}
+                                                            >
+                                                                Vincular Item
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    {this.renderBodyGerenc()}
+                                                    <div className="row">
+                                                        <div className="col-12 modal-footer d-flex justify-content-end">
+                                                            <button
+                                                                ref={ref => (this.buttonFecharGerencRef = ref)} 
+                                                                type="button" 
+                                                                className="btn btn-secondary"
+                                                                onClick={() => this.onClickFecharGerenc()}
+                                                                data-dismiss="modal">
+                                                                Fechar
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </TabPanel>
+                                                <TabPanel>
+                                                    {this.renderBodyLote()}
+                                                    <div className="row">
+                                                        <div className="col-12 modal-footer d-flex justify-content-end">
+                                                            <button 
+                                                                className="btn btn-primary"
+                                                                type="button"
+                                                                onClick={() =>  this.onClickConfirmLote()}
+                                                            >
+                                                                Confirmar
+                                                            </button>
+                                                            <button
+                                                                ref={ref => (this.buttonFecharLoteRef = ref)} 
+                                                                type="button" 
+                                                                className="btn btn-secondary"
+                                                                onClick={() => this.onClickFecharLote()}
+                                                                data-dismiss="modal">
+                                                                Fechar
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </TabPanel>
+                                            </Tabs>
                                         </div>
                                     </React.Fragment>
                                 </div>
@@ -141,7 +260,8 @@ class VincularModal extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    overlayModal: state.VincularReducer.overlayModal
+    overlayModal: state.VincularReducer.overlayModal,
+    dataTableItemManutencao: state.ItemManutencaoReducer.dataTableItemManutencao
 });
 
 export default connect(mapStateToProps, {

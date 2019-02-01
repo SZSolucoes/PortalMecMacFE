@@ -8,7 +8,6 @@ import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, {  Search } from 'react-bootstrap-table2-toolkit';
 
-import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../../utils/UtilsActions';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css"
 
 class VincularTableItens extends Component {
@@ -253,6 +252,12 @@ class VincularTableItens extends Component {
                                     wrapperClasses="vinculartable"
                                     filter={filterFactory()}
                                     bootstrap4
+                                    defaultSorted={
+                                        [{
+                                            dataField: 'id',
+                                            order: 'desc'
+                                        }]
+                                    }
                                 />
                             </div>
                         )

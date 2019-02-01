@@ -29,6 +29,7 @@ import {
 
 import { store } from '../index';
 import { BASEURLEX } from '../components/utils/urls';
+import { refreshVehicle } from '../components/cadastroveiculo/CadastroVeiculoActions';
 
 export const socket = SocketIO(BASEURLEX);
 
@@ -90,6 +91,12 @@ class App extends Component {
         };
 
         funExec();
+
+        socket.on('table_veiculos_changed', data => {
+            if (data) {
+                funExec();
+            }
+        });
     }
 
     render() {

@@ -17,6 +17,10 @@
     font-family: 'Montserrat', sans-serif;
 }
 
+.modal {
+    overflow-y:auto;
+}
+
 /* Layout em Grid */
 
 .app {

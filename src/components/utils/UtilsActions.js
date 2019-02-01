@@ -82,7 +82,7 @@ export const doModalAction = (extraData) => dispatch => {
     } else if (extraData.action && extraData.action === 'confirm_vincularitemmanut') {
         doConfirmVincular(extraData.params, extraData.btnCloseModal)(dispatch);
     } else if (extraData.action && extraData.action === 'remove_vincularitemmanut') {
-        doDeleteVincular(extraData.item)(dispatch);
+        doDeleteVincular(extraData.item, extraData.btnAction)(dispatch);
     } else if (extraData.action && extraData.action === 'incluibatch_vincularitemmanut') {
         doPostVincCsvItens(extraData.item)(dispatch);
     }

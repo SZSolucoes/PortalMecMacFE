@@ -7,6 +7,18 @@ export const modifyVincularItem = (value) => ({
     payload: value
 });
 
+export const getVeicVincItens = async (id) => {
+    return await Axios.get(`${BASEURL}itemmanutxvehiclevtwo`, { params: { id } })
+        .then((res) => {
+            if (res && res.data) {
+                    return res.data;
+            } else {
+                return [];
+            }
+        })
+        .catch(() => []);
+}
+
 export const doConfirmVincular = (params, btnCloseModal) => async dispatch => {
     dispatch({
         type: 'modify_overlaymodal_vincularitemmanut',
@@ -41,5 +53,24 @@ export const doConfirmVincular = (params, btnCloseModal) => async dispatch => {
         type: 'modify_overlaymodal_vincularitemmanut',
         payload: false
     });
+}
+
+export const doConfirmVincularSimp = async (params, btnAction) => {
+    await Axios.post(`${BASEURL}itemmanutxvehicle`, params)
+        .then((res) => {
+            if (res && res.data) {
+                if (res.data.success === 'true') {
+                    if (btnAction) {
+                        btnAction();
+                    }
+                    setTimeout(() => toastr.success('Sucesso', res.data.message), 1000);
+                    return true;
+                } else {
+                    toastr.error('Erro', res.data.message);
+                    return false;
+                }
+            }
+        })
+        .catch(() => false);
 }
 

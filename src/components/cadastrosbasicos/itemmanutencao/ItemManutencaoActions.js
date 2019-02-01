@@ -94,13 +94,16 @@ export const doDeleteItemManutencao = (id) => dispatch => {
     .catch(() => toastr.error('Erro', 'Falha de comunicação com o servidor.'))
 }
 
-export const doDeleteVincular = (params) => dispatch => {
+export const doDeleteVincular = (params, btnAction) => dispatch => {
     Axios.delete(`${BASEURL}itemmanutxvehicle`, {
         params
     })
     .then((res) => {
         if (res && res.data) {
             if (res.data.success === 'true') {
+                if (btnAction) {
+                    btnAction();
+                }
                 toastr.success('Sucesso', res.data.message);
             } else {
                 toastr.error('Erro', res.data.message); 

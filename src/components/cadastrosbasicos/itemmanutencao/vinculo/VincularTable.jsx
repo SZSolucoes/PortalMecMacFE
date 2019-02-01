@@ -25,6 +25,11 @@ class VincularTable extends Component {
 
         this.columnsTable = [
             {
+                dataField: 'recrow',
+                text: 'recrow',
+                hidden: true
+            }, 
+            {
                 dataField: 'id',
                 text: 'id',
                 hidden: true,
@@ -37,7 +42,7 @@ class VincularTable extends Component {
                 dataField: 'fipeperiodoref',
                 text: 'Fipe Mês/Ano',
                 sort: true,
-                headerStyle: { textAlign: 'left', whiteSpace: 'nowrap' },
+                headerStyle: { textAlign: 'left' },
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
@@ -288,6 +293,12 @@ class VincularTable extends Component {
                                     wrapperClasses="vinculartable"
                                     filter={filterFactory()}
                                     bootstrap4
+                                    defaultSorted={
+                                        [{
+                                            dataField: 'recrow',
+                                            order: 'desc'
+                                        }]
+                                    }
                                 />
                             </div>
                         )

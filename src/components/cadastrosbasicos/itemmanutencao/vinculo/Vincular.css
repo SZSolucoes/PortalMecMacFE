@@ -91,3 +91,11 @@
 .divvinctables {
     border-style: solid
 }
+
+.buttonmove {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 15px;
+    padding-left: 15px;
+}
