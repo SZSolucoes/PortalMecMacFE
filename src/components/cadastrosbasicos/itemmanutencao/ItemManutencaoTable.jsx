@@ -6,7 +6,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { onMount, onUnmount } from 'react-keydown/es/event_handlers';
 import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
-//import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import CSVReader from 'react-csv-reader';
@@ -20,6 +20,8 @@ import { store } from '../../../index';
 import { doGetLastId, doFetchVehicles } from './ItemManutencaoActions';
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../utils/UtilsActions';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css"
+
+const csvFields = 'id|referencia|referênciaitemabrev|nome abreviado|nomeabreviado|item|';
 
 class ItemManutencaoTable extends Component {
     constructor(props) {
@@ -142,13 +144,13 @@ class ItemManutencaoTable extends Component {
                     data = [].concat.apply([], data);
                 
                     data = _.filter(data, row => {
-                        if (row.length !== 2) {
+                        if (row.length !== 3) {
                             return false;
                         }
 
                         for (let index = 0; index < row.length; index++) {
                             const element = row[index].toLowerCase().trim();
-                            if ('id|itemabrev|nome abreviado|nomeabreviado|item|'.includes(element)) {
+                            if (csvFields.includes(element)) {
                                 return false;
                             }
 
@@ -206,6 +208,7 @@ class ItemManutencaoTable extends Component {
             store.dispatch(change('itemmanutencaomdfform', 'id', selectedRow.id));
             store.dispatch(change('itemmanutencaomdfform', 'itemabrev', selectedRow.itemabrev));
             store.dispatch(change('itemmanutencaomdfform', 'item', selectedRow.item));
+            store.dispatch(change('itemmanutencaomdfform', 'referencia', selectedRow.referencia));
             store.dispatch({
                 type: 'modify_formvalues_itemmanutencao',
                 payload: selectedRow
@@ -245,13 +248,13 @@ class ItemManutencaoTable extends Component {
 
     handleCsvFile(data, name) {
         let newData = _.filter(data, row => {
-            if (row.length !== 2) {
+            if (row.length !== 3) {
                 return false;
             }
 
             for (let index = 0; index < row.length; index++) {
                 const element = row[index].toLowerCase().trim();
-                if ('id|itemabrev|nome abreviado|nomeabreviado|item|'.includes(element)) {
+                if (csvFields.includes(element)) {
                     return false;
                 }
 
@@ -355,29 +358,39 @@ class ItemManutencaoTable extends Component {
                 dataField: 'id',
                 text: 'ID',
                 sort: true,
-                csvExport: false
+                csvExport: false,
+                hidden: true
                 /* filter: textFilter({
                     placeholder: ' ',
                     delay: 0
                 }), */
             }, 
             {
+                dataField: 'referencia',
+                text: 'Referência',
+                sort: true,
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
+            },
+            {
                 dataField: 'itemabrev',
                 text: 'Nome Abreviado',
-                sort: true
-                /* filter: textFilter({
-                    placeholder: ' ',
+                sort: true,
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
                     delay: 0
-                }) */
+                })
             },
             {
                 dataField: 'item',
                 text: 'Item',
-                sort: true
-                /* filter: textFilter({
-                    placeholder: ' ',
+                sort: true,
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
                     delay: 0
-                }) */
+                })
             }
         ];
         return (
@@ -524,7 +537,7 @@ class ItemManutencaoTable extends Component {
                                                     striped
                                                     condensed
                                                     wrapperClasses="itemmanutencaotable"
-                                                    //filter={filterFactory()}
+                                                    filter={filterFactory()}
                                                     exportCsv
                                                     bootstrap4
                                                 />

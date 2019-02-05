@@ -36,7 +36,6 @@ class VincularTable extends Component {
                 formatter: (cell, row, rowIndex, formatExtraData) => {
                     return `${row.fipemesano.trim()}|${row.marca.trim()}|${row.modelo.trim()}|${row.ano.trim()}`;
                 }
-                
             }, 
             {
                 dataField: 'fipeperiodoref',
@@ -46,7 +45,8 @@ class VincularTable extends Component {
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterFipePeriodoRef = filter)
                 })
             }, 
             {
@@ -57,7 +57,8 @@ class VincularTable extends Component {
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterMarca = filter)
                 })
             }, 
             {
@@ -68,7 +69,8 @@ class VincularTable extends Component {
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterModelo = filter)
                 })
             }, 
             {
@@ -79,7 +81,8 @@ class VincularTable extends Component {
                 style: { textAlign: 'center' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterAno = filter)
                 })
             }, 
             {
@@ -90,7 +93,8 @@ class VincularTable extends Component {
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterCombustivel = filter)
                 })
             }
         ];
@@ -154,6 +158,25 @@ class VincularTable extends Component {
             cpymanut: true,
             cpyaros: true
         });
+
+        if (this.filterFipePeriodoRef && typeof this.filterFipePeriodoRef === 'function') {
+            this.filterFipePeriodoRef('');
+        }
+        if (this.filterMarca && typeof this.filterMarca === 'function') {
+            this.filterMarca('');
+        }
+        if (this.filterModelo && typeof this.filterModelo === 'function') {
+            this.filterModelo('');
+        }
+        if (this.filterAno && typeof this.filterAno === 'function') {
+            this.filterAno('');
+        }
+        if (this.filterCombustivel && typeof this.filterCombustivel === 'function') {
+            this.filterCombustivel('');
+        }
+        if (this.clearSearchBtn) {
+            this.clearSearchBtn.firstChild.click();
+        }
     }
 
     handleOnSelect(row, isSelect, rowIndex, e) {
@@ -263,6 +286,15 @@ class VincularTable extends Component {
                                 <div className='vinculartabletools'>
                                     <div style={{ flex: 1 }}>
                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
+                                        <div
+                                            ref={ref => (this.clearSearchBtn = ref)}
+                                            hidden
+                                        >
+                                            <Search.ClearSearchButton
+                                                { ...props.searchProps }
+                                                hidden
+                                            />
+                                        </div>
                                     </div>
                                     <div className='vincularbtnshowselected'>
                                         <div className="form-check">

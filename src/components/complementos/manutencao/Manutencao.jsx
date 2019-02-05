@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux';
 import { Field, reduxForm, getFormValues } from 'redux-form';
 import _ from 'lodash';
+import Select from 'react-select';
 import Main from '../../templates/Main';
 import RadioGroup from '../../utils/RadioGroup';
 import RadioGroupInline from '../../utils/RadioGroupInline';
@@ -35,7 +36,8 @@ class Manutencao extends React.Component {
                     milhas: '',
                     quilometros: ''
                 }
-            ]
+            ],
+            itemmanutcombo: 0
         };
     }
 
@@ -49,7 +51,7 @@ class Manutencao extends React.Component {
     onClickAdicionar() {
         const formValues = getFormValues('manutencao')(store.getState());
         const vehicle = { ...this.props.item };
-        if (typeof vehicle === 'object' && Object.keys(vehicle).length && formValues.iditemmanut) {
+        if (typeof vehicle === 'object' && Object.keys(vehicle).length && this.state.itemmanutcombo.value) {
             if (vehicle.vehicletype) {
                 let keyTable = {};
                 if (vehicle.vehicletype === '1') {
@@ -61,7 +63,7 @@ class Manutencao extends React.Component {
                 }
 
                 this.props.doPostManutencao({
-                    iditemmanut: formValues.iditemmanut,
+                    iditemmanut: this.state.itemmanutcombo.value,
                     mes: formValues.mes,
                     milhas: formValues.milhas,
                     quilometros: formValues.km,
@@ -75,7 +77,7 @@ class Manutencao extends React.Component {
     onClickAdicionarLote() {
         const formValues = getFormValues('manutencao')(store.getState());
         const vehicle = { ...this.props.item };
-        if (typeof vehicle === 'object' && Object.keys(vehicle).length && formValues.iditemmanut) {
+        if (typeof vehicle === 'object' && Object.keys(vehicle).length && this.state.itemmanutcombo.value) {
             if (vehicle.vehicletype) {
                 let tbl = '';
 
@@ -99,7 +101,7 @@ class Manutencao extends React.Component {
                             nlt.milhas,
                             nlt.quilometros,
                             formValues.manutencao,
-                            formValues.iditemmanut
+                            this.state.itemmanutcombo.value
                         ]));
 
                     this.props.doPostManutencaoLote(
@@ -386,7 +388,8 @@ class Manutencao extends React.Component {
                     </div>
                     <div className='col-4 col-md-4 d-flex justify-content-center'>
                         <button 
-                            className='btn btn-sm btn-danger btn-block'
+                            className='btn btn-sm btn-secondary btn-block'
+                            style={{ color: 'white' }}
                             type='button'
                             onClick={() => this.setState({
                                 loterows: [
@@ -454,31 +457,28 @@ class Manutencao extends React.Component {
                             <div className='col-12'>
                                 <div className='form-group'>
                                     <label htmlFor='iditemmanut'>Itens de Manutenção</label>
-                                    <Field 
-                                        component="select" 
-                                        className="form-control" 
+                                    <Select 
                                         name="iditemmanut"
-                                        //onChange={event => this.consultarFipe(event, 'fipeperiodoref')}
-                                    >
-                                        {
-                                             this.props.itemManutencaoCombo.map((value, index) => {
-                                                 if (value.itemabrev) {
-                                                    return (
-                                                        <option 
-                                                            key={index} 
-                                                            value={value.itemmanutid}
-                                                        >
-                                                            {value.itemabrev}
-                                                        </option>
-                                                    );
-                                                 }
-
-                                                 return null;
-                                             }
-                                                
-                                            )
+                                        placeholder={'Selecionar item...'}
+                                        noOptionsMessage={() => 'Não há opções...'}
+                                        onChange={option => 
+                                            this.setState({ 
+                                                itemmanutcombo: option 
+                                            })
                                         }
-                                    </Field>
+                                        options={
+                                            this.props.itemManutencaoCombo.map((value, index) => {
+                                                if (value.itemabrev) {
+                                                   return ({
+                                                       value: value.itemmanutid,
+                                                       label: value.itemabrev
+                                                   });
+                                                }
+
+                                                return null;
+                                            })
+                                        }
+                                    />
                                 </div>
                             </div>
                         </div>

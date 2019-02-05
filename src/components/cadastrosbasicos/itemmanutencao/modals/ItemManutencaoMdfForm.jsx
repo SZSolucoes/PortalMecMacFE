@@ -19,14 +19,16 @@ class ItemManutencaoMdfForm extends React.Component {
     onSubmitModifyForm(values) {
         const {
             id,
+            referencia,
+            itemabrev,
             item,
-            itemabrev
         } = values;
 
         const params = {
             id,
+            referencia,
+            itemabrev,
             item,
-            itemabrev
         };
 
         this.props.doPutItem(params, () => this.closeBtn);
@@ -42,6 +44,7 @@ class ItemManutencaoMdfForm extends React.Component {
         store.dispatch(change('itemmanutencaomdfform', 'id', formValues.id));
         store.dispatch(change('itemmanutencaomdfform', 'itemabrev', formValues.itemabrev));
         store.dispatch(change('itemmanutencaomdfform', 'item', formValues.item));
+        store.dispatch(change('itemmanutencaomdfform', 'referencia', formValues.referencia));
     }
 
     renderField({ input, label, type, meta: { touched, error, warning, submitFailed } }) {
@@ -59,7 +62,7 @@ class ItemManutencaoMdfForm extends React.Component {
         return (
             <form onSubmit={handleSubmit(this.onSubmitModifyForm)}>
                 <div className="row">
-                    <div className="col-12 col-md-3">
+                    {/* <div className="col-12 col-md-3">
                         <div className="form-group">
                             <label htmlFor="id">ID</label>
                             <Field 
@@ -70,7 +73,15 @@ class ItemManutencaoMdfForm extends React.Component {
                                 disabled
                             />
                         </div>
-                    </div>
+                    </div> */}
+                    <Field 
+                        component="input"
+                        type="text"
+                        className="form-control" 
+                        name="id"
+                        disabled
+                        hidden
+                    />
                     <div className="col-12 col-md-4">
                         <div className="form-group">
                             <label htmlFor="itemabrev">Nome Abreviado *</label>
@@ -83,7 +94,7 @@ class ItemManutencaoMdfForm extends React.Component {
                             />
                         </div>
                     </div> 
-                    <div className="col-12 col-md-5">
+                    <div className="col-12 col-md-8">
                         <div className="form-group">
                             <label htmlFor="item">Item *</label>
                             <Field 
@@ -95,6 +106,23 @@ class ItemManutencaoMdfForm extends React.Component {
                             />
                         </div>
                     </div> 
+                </div>
+                <div className="row">
+                    <div className='col-6'>
+                        <div className='form-group'>
+                            <label htmlFor='referencia'>Referência</label>
+                            <Field
+                                component={'textarea'}
+                                className='form-control'
+                                name='referencia'
+                                rows={4}
+                                placeholder={
+                                    'Valores de referência separados por ponto-e-vírgula.\n\n' +
+                                    'Exemplo: Veiculo01;Veiculo02;Veiculo03;...'
+                                }
+                            />
+                        </div>
+                    </div>
                 </div>
                 <div className="row">
                     <div className="col-12 modal-footer d-flex justify-content-end">
@@ -139,7 +167,8 @@ const mapStateToProps = (state) => ({
     initialValues: {
         id: '',
         item: '',
-        itemabrev: ''
+        itemabrev: '',
+        referencia: ''
     }
 });
 

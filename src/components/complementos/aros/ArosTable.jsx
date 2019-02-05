@@ -4,7 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { onMount, onUnmount } from 'react-keydown/es/event_handlers';
 import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
-//import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
 import { change } from 'redux-form';
 import _ from 'lodash';
@@ -144,14 +144,22 @@ class ManutencaoTable extends Component {
                 text: 'Aro',
                 sort: true,
                 headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left' }
+                style: { textAlign: 'left' },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
             }, 
             {
                 dataField: 'subcat',
                 text: 'Sub-categoria',
                 sort: true,
                 headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left' }
+                style: { textAlign: 'left' },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
             }
         ];
         return (
@@ -233,7 +241,7 @@ class ManutencaoTable extends Component {
                                     striped
                                     condensed
                                     wrapperClasses="arostable"
-                                    //filter={filterFactory()}
+                                    filter={filterFactory()}
                                     exportCsv
                                     bootstrap4
                                     defaultSorted={

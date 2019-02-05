@@ -66,7 +66,16 @@ export const doConfirmVincularSimp = async (params, btnAction) => {
                     setTimeout(() => toastr.success('Sucesso', res.data.message), 1000);
                     return true;
                 } else {
-                    toastr.error('Erro', res.data.message);
+                    const lowerMsg = res.data.message.toLowerCase();
+                    if (lowerMsg.indexOf('duplicate') !== -1 || lowerMsg.indexOf('constraint fails') !== -1) {
+                        toastr.error('Erro', 'Item já vinculado.');
+                        return;
+                    }
+    
+                    if (res.data.success === 'false') {
+                        console.log(res.data.message);
+                        toastr.error('Erro', 'Falha ao vincular item.');
+                    }
                     return false;
                 }
             }

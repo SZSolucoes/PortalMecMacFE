@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { onMount, onUnmount } from 'react-keydown/es/event_handlers';
 import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
-//import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
 import CSVReader from 'react-csv-reader';
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
@@ -405,7 +405,8 @@ class CBArosTable extends Component {
                 dataField: 'id',
                 text: 'ID',
                 sort: true,
-                csvExport: false
+                csvExport: false,
+                hidden: true,
                 /* filter: textFilter({
                     placeholder: ' ',
                     delay: 0
@@ -434,20 +435,20 @@ class CBArosTable extends Component {
                         return 'Caminhão';
                     }
                     return '';
-                }
-                /* filter: textFilter({
-                    placeholder: ' ',
+                },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
                     delay: 0
-                }) */
+                })
             },
             {
                 dataField: 'aro',
                 text: 'Aro',
-                sort: true
-                /* filter: textFilter({
-                    placeholder: ' ',
+                sort: true,
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
                     delay: 0
-                }) */
+                })
             }
         ];
         return (
@@ -588,7 +589,7 @@ class CBArosTable extends Component {
                                                     striped
                                                     condensed
                                                     wrapperClasses="cbarostable"
-                                                    //filter={filterFactory()}
+                                                    filter={filterFactory()}
                                                     exportCsv
                                                     bootstrap4
                                                     defaultSorted={

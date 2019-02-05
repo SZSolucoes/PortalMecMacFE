@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Field, reduxForm, getFormValues, change, reset } from 'redux-form'
 import { createNumberMask } from 'redux-form-input-masks';
 import { withRouter } from 'react-router-dom';
+import Select from 'react-select';
 
 import _ from 'lodash';
 
@@ -44,8 +45,39 @@ class CadastroVeiculoForm extends React.Component {
         this.resetFields = this.resetFields.bind(this);
 
         this.state = {
-            lockCombos: false
+            lockCombos: false,
+            fipeperiodoref: 0,
+            fipemarca: 0,
+            fipemodelo: 0,
+            fipeano: 0
         }
+    }
+
+    componentDidUpdate(prevProps) {
+        const {
+            fipeTabRef,
+            formVeiculoType
+         } = this.props;
+
+         const validNumber = typeof this.state.fipeperiodoref === 'number';
+         const validPropsVeic = !!formVeiculoType;
+         const validPrevPropsVeic = !!prevProps.formVeiculoType;
+         const validDiffProps = validPropsVeic && validPrevPropsVeic && prevProps.formVeiculoType !== formVeiculoType;
+
+         if ((validNumber && validPropsVeic) || validDiffProps) {
+            let fipePeriodoRefValue = '';
+            let fipePeriodoRefMes = '';
+    
+            if (fipeTabRef && fipeTabRef.length > 0) {
+                fipePeriodoRefValue = fipeTabRef[0].Codigo;
+                fipePeriodoRefMes = fipeTabRef[0].Mes;
+            }
+
+            if (fipePeriodoRefValue && fipePeriodoRefMes) {
+                const fipeperiodorefoption = { value: fipePeriodoRefValue, label: fipePeriodoRefMes };
+                this.consultarFipe(fipeperiodorefoption, 'fipeperiodoref');
+            }
+         }
     }
 
     onSubmitVeiculoForm(values) {
@@ -82,12 +114,16 @@ class CadastroVeiculoForm extends React.Component {
 
     onClickCarregar() {
         const asyncFunExec = async () => {
-            const state = store.getState();
-            const formValues = getFormValues('cadastroveiculos')(state);
-            const fipePeriodoRef = formValues.fipeperiodoref;
-            const fipeMarca = formValues.fipemarca
-            const fipeModelo = formValues.fipemodelo;
-            const fipeAno = formValues.fipeano;
+            const {
+                fipeperiodoref,
+                fipemarca,
+                fipemodelo,
+                fipeano
+            } = this.state;
+            const fipePeriodoRef = typeof fipeperiodoref === 'object' ? fipeperiodoref.value : undefined;
+            const fipeMarca = typeof fipemarca === 'object' ? fipemarca.value : undefined;
+            const fipeModelo = typeof fipemodelo === 'object' ? fipemodelo.value : undefined;
+            const fipeAno = typeof fipeano === 'object' ? fipeano.value : undefined;
 
             if (fipePeriodoRef && fipeMarca && fipeModelo && fipeAno) {
                 const fipeAnoSplited = fipeAno.split('-');
@@ -160,74 +196,88 @@ class CadastroVeiculoForm extends React.Component {
         asyncFunExec();
     }
 
-    consultarFipe(event, field) {
+    consultarFipe(option, field) {
         this.setState({ lockCombos: true });
-        const state = store.getState();
         switch (field) {
             case 'fipeperiodoref':
-                const valuePeriodo = event.target.value;
+                this.setState({ fipeperiodoref: option });
+                const valuePeriodo = option.value;
                 const veiculoPeriodo = this.props.formVeiculoType;
+                console.log(veiculoPeriodo);
                 const funExecPeriodo = async () => {
                     const marcas = await consultarMarcas(valuePeriodo, veiculoPeriodo);
-                    if (marcas.success) {
+                    if (marcas.success && marcas.data instanceof Array) {
                         store.dispatch({
                             type: 'modify_fipemarcas_cadastroveiculo',
                             payload: marcas.data
                         })
-                        store.dispatch(change('cadastroveiculos', 'fipemarca', marcas.data[0].Value));
-                        this.consultarFipe({ target: { value: marcas.data[0].Value } }, 'fipemarca');
+
+                        const fipemarcaoption = { value: marcas.data[0].Value, label: marcas.data[0].Label };
+                        this.setState({ fipemarca: fipemarcaoption });
+                        this.consultarFipe(fipemarcaoption, 'fipemarca');
                     } else { return }
                 }
                 funExecPeriodo();
                 break;
             case 'fipemarca':
-                const valueMarca = event.target.value;
+                this.setState({ fipemarca: option });
+                const valueMarca = option.value;
                 const veiculoMarca = this.props.formVeiculoType;
                 const funExecMarca = async () => {
-                    const fipePeriodoRef = getFormValues('cadastroveiculos')(state).fipeperiodoref;
+                    const fipePeriodoRef = this.state.fipeperiodoref.value;
                     if (fipePeriodoRef) {
                         const modelos = await consultarModelos(
                             fipePeriodoRef,
                             veiculoMarca,
                             valueMarca
                         );
-                        if (modelos.success) {
+                        if (modelos.success && modelos.data instanceof Array) {
                             store.dispatch({
                                 type: 'modify_fipemodelos_cadastroveiculo',
                                 payload: modelos.data
                             })
-                            store.dispatch(change('cadastroveiculos', 'fipemodelo', modelos.data[0].Value));
-                            this.consultarFipe({ target: { value: modelos.data[0].Value } }, 'fipemodelo');
+
+                            const fipemodelooption = { value: modelos.data[0].Value, label: modelos.data[0].Label };
+                            this.setState({ fipemodelo: fipemodelooption });
+                            this.consultarFipe(fipemodelooption, 'fipemodelo');
                         } 
                     }
                 }
                 funExecMarca();
                 break;
             case 'fipemodelo':
-                const valueModelo = event.target.value;
+                this.setState({ fipemodelo: option });
+                const valueModelo = option.value;
                 const veiculoModelo = this.props.formVeiculoType;
                 const funExecModelo = async () => {
-                    const fipePeriodoRef = getFormValues('cadastroveiculos')(state).fipeperiodoref;
-                    const fipeMarca = getFormValues('cadastroveiculos')(state).fipemarca;
+                    const fipePeriodoRef = this.state.fipeperiodoref.value;
+                    const fipeMarca = this.state.fipemarca.value;
                     if (fipePeriodoRef && fipeMarca) {
-                        const marcas = await consultarAnoModelo(
+                        const ano = await consultarAnoModelo(
                             fipePeriodoRef,
                             veiculoModelo,
                             fipeMarca,
                             valueModelo
                         );
-                        if (marcas.success) {
+                        if (ano.success && ano.data instanceof Array) {
                             store.dispatch({
                                 type: 'modify_fipeanos_cadastroveiculo',
-                                payload: marcas.data
-                            })
-                            store.dispatch(change('cadastroveiculos', 'fipeano', marcas.data[0].Value));
+                                payload: ano.data
+                            });
+                            let newLabel = ano.data[0].Label;
+                            if (newLabel.includes('32000')) {
+                                newLabel = newLabel.replace('32000', 'Zero KM');
+                            }
+                            const fipeanooption = { value: ano.data[0].Value, label: newLabel };
+                            this.setState({ fipeano: fipeanooption });
                         } 
                     }
                 }
                 funExecModelo();
                 break;
-
+            case 'fipeano':
+                this.setState({ fipeano: option });
+                break;
             default:
         }
         setTimeout(() => this.setState({ lockCombos: false }), 1000);
@@ -244,6 +294,14 @@ class CadastroVeiculoForm extends React.Component {
         store.dispatch(change('cadastroveiculos', 'valor', ''));
         store.dispatch(change('cadastroveiculos', 'combustivel', ''));
 
+        this.setState({
+            lockCombos: false,
+            fipeperiodoref: 0,
+            fipemarca: 0,
+            fipemodelo: 0,
+            fipeano: 0
+        });
+
         //this.props.modifyComplementosItem(item);
         //this.props.history.push('/complementos');
     }
@@ -256,9 +314,11 @@ class CadastroVeiculoForm extends React.Component {
         } = this.props;
 
         let fipePeriodoRefValue = '';
+        let fipePeriodoRefMes = '';
 
         if (fipeTabRef && fipeTabRef.length > 0) {
             fipePeriodoRefValue = fipeTabRef[0].Codigo;
+            fipePeriodoRefMes = fipeTabRef[0].Mes;
         }
 
         reset();
@@ -273,44 +333,32 @@ class CadastroVeiculoForm extends React.Component {
         }
 
         setTimeout(() => {
-            store.dispatch(change('cadastroveiculos', 'fipeperiodoref', fipePeriodoRefValue));
-            this.consultarFipe({ target: { value: fipePeriodoRefValue } }, 'fipeperiodoref');
+            const fipeperiodorefoption = { value: fipePeriodoRefValue, label: fipePeriodoRefMes };
+            this.consultarFipe(fipeperiodorefoption, 'fipeperiodoref');
         }, 500);
     }
 
     renderFipeRefOptions() {
-        return this.props.fipeTabRef.map((value, index) => 
-            <option key={index} value={value.Codigo}>{value.Mes}</option>
-        );
+        return this.props.fipeTabRef.map((value, index) => ({ value: value.Codigo, label: value.Mes }));
     }
 
     renderFipeMarcaOptions() {
-        const options = this.props.fipeMarcas.map((value, index) => 
-            <option key={index} value={value.Value}>{value.Label}</option>
-        );
-
-        return options;
+        return this.props.fipeMarcas.map((value, index) => ({ value: value.Value, label: value.Label }));
     }
 
     renderFipeModeloOptions() {
-        const options = this.props.fipeModelos.map((value, index) => 
-            <option key={index} value={value.Value}>{value.Label}</option>
-        );
-
-        return options;
+        return this.props.fipeModelos.map((value, index) => ({ value: value.Value, label: value.Label }));
     }
 
     renderFipeAnoOptions() {
-        const options = this.props.fipeAnos.map((value, index) => {
+        return this.props.fipeAnos.map((value, index) => {
             let newLabel = value.Label;
             if (newLabel.includes('32000')) {
                 newLabel = newLabel.replace('32000', 'Zero KM');
             }
-            return <option key={index} value={value.Value}>{newLabel}</option>
-        }
-        );
 
-        return options;
+            return ({ value: value.Value, label: newLabel });
+        });
     }
 
     renderField({ input, label, type, meta: { touched, error, warning, submitFailed } }) {
@@ -327,62 +375,59 @@ class CadastroVeiculoForm extends React.Component {
         return (
             <form onSubmit={handleSubmit(this.onSubmitVeiculoForm)}>
                 <div className="form">
-                    <div className="divdatabasic">
+                    <div className="divdatabasic" style={{ overflow: 'visible' }}>
                         <h4>Fipe</h4>
                         <div className="row">
                             <div className="col-12 col-md-6 col-lg-6 col-xl-2">
                                 <div className="form-group">
                                     <label htmlFor="fipeperiodoref">Período</label>
-                                    <Field 
-                                        component="select" 
-                                        className="form-control" 
+                                    <Select 
                                         name="fipeperiodoref"
-                                        onChange={event => this.consultarFipe(event, 'fipeperiodoref')}
-                                        disabled={this.state.lockCombos}
-                                    >
-                                        {this.renderFipeRefOptions()}
-                                    </Field>
+                                        value={this.state.fipeperiodoref}
+                                        onChange={option => this.consultarFipe(option, 'fipeperiodoref')}
+                                        noOptionsMessage={() => 'Não há opções...'}
+                                        isDisabled={this.state.lockCombos}
+                                        options={this.renderFipeRefOptions()}
+                                    />
                                 </div>
                             </div>
                             <div className="col-12 col-md-6 col-lg-6 col-xl-3">
                                 <div className="form-group">
                                     <label htmlFor="fipemarca">Marca</label>
-                                    <Field 
-                                        component="select" 
-                                        className="form-control" 
+                                    <Select 
                                         name="fipemarca"
-                                        onChange={event => this.consultarFipe(event, 'fipemarca')}
-                                        disabled={this.state.lockCombos}
-                                    >
-                                        {this.renderFipeMarcaOptions()}
-                                    </Field>
+                                        value={this.state.fipemarca}
+                                        onChange={option => this.consultarFipe(option, 'fipemarca')}
+                                        noOptionsMessage={() => 'Não há opções...'}
+                                        isDisabled={this.state.lockCombos}
+                                        options={this.renderFipeMarcaOptions()}
+                                    />
                                 </div>
                             </div>
                             <div className="col-12 col-md-6 col-lg-6 col-xl-5">
                                 <div className="form-group">
                                     <label htmlFor="fipemodelo">Modelo</label>
-                                    <Field 
-                                        component="select" 
-                                        className="form-control" 
+                                    <Select 
                                         name="fipemodelo"
-                                        onChange={event => this.consultarFipe(event, 'fipemodelo')}
-                                        disabled={this.state.lockCombos}
-                                    >
-                                        {this.renderFipeModeloOptions()}
-                                    </Field>
+                                        value={this.state.fipemodelo}
+                                        onChange={option => this.consultarFipe(option, 'fipemodelo')}
+                                        noOptionsMessage={() => 'Não há opções...'}
+                                        isDisabled={this.state.lockCombos}
+                                        options={this.renderFipeModeloOptions()}
+                                    />
                                 </div>
                             </div>
                             <div className="col-12 col-md-6 col-lg-6 col-xl-2">
                                 <div className="form-group">
                                     <label htmlFor="fipeano">Ano</label>
-                                    <Field 
-                                        component="select" 
-                                        className="form-control" 
+                                    <Select 
                                         name="fipeano"
-                                        disabled={this.state.lockCombos}
-                                    >
-                                        {this.renderFipeAnoOptions()}
-                                    </Field>
+                                        value={this.state.fipeano}
+                                        onChange={option => this.consultarFipe(option, 'fipeano')}
+                                        noOptionsMessage={() => 'Não há opções...'}
+                                        isDisabled={this.state.lockCombos}
+                                        options={this.renderFipeAnoOptions()}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -506,7 +551,7 @@ class CadastroVeiculoForm extends React.Component {
                                     type="button" 
                                     className="btn btn-secondary"
                                     ref={ref => (this.closeBtn = ref)}
-                                    onClick={() => reset()} 
+                                    onClick={() => { reset(); this.hideModal(); }} 
                                     data-dismiss="modal">
                                     Fechar
                                 </button>

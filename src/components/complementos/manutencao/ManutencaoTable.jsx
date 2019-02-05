@@ -6,7 +6,7 @@ import { onMount, onUnmount } from 'react-keydown/es/event_handlers';
 import { setBinding, /*Keys as KeyDownKeys*/ } from 'react-keydown';
 import { change } from 'redux-form';
 import _ from 'lodash';
-//import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolkit';
 
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../utils/UtilsActions';
@@ -145,42 +145,66 @@ class ManutencaoTable extends Component {
                 text: 'Nome Abrev.',
                 sort: true,
                 headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left', overflow: 'auto' }
+                style: { textAlign: 'left', overflow: 'auto' },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
             }, 
             {
                 dataField: 'itemmanut',
                 text: 'Item Manutenção',
                 sort: true,
                 headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left', overflow: 'auto' }
+                style: { textAlign: 'left', overflow: 'auto' },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
             }, 
             {
                 dataField: 'mes',
                 text: 'Mês',
                 sort: true,
                 headerStyle: { textAlign: 'center' },
-                style: { textAlign: 'center' }
+                style: { textAlign: 'center' },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
             }, 
             {
                 dataField: 'milhas',
                 text: 'Mi x 1000',
                 sort: true,
                 headerStyle: { textAlign: 'center' },
-                style: { textAlign: 'center' }
+                style: { textAlign: 'center' },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
             }, 
             {
                 dataField: 'quilometros',
                 text: 'Km x 1000',
                 sort: true,
                 headerStyle: { textAlign: 'center' },
-                style: { textAlign: 'center' }
+                style: { textAlign: 'center' },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
             }, 
             {
                 dataField: 'tipomanut',
                 text: 'Manutenção',
                 sort: true,
                 headerStyle: { textAlign: 'left' },
-                style: { textAlign: 'left' }
+                style: { textAlign: 'left' },
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0
+                })
             }
         ];
         return (
@@ -262,7 +286,7 @@ class ManutencaoTable extends Component {
                                     striped
                                     condensed
                                     wrapperClasses="manutencaotable"
-                                    //filter={filterFactory()}
+                                    filter={filterFactory()}
                                     exportCsv
                                     bootstrap4
                                     defaultSorted={

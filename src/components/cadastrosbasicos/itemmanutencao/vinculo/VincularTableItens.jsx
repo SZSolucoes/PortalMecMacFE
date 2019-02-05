@@ -29,18 +29,26 @@ class VincularTableItens extends Component {
                 text: 'ID',
                 sort: true,
                 csvExport: false,
-                filter: textFilter({
-                    placeholder: ' ',
-                    delay: 0
-                })
+                hidden: true
             }, 
+            {
+                dataField: 'referencia',
+                text: 'Referência',
+                sort: true,
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0,
+                    getFilter: filter => (this.filterReferencia = filter)
+                })
+            },
             {
                 dataField: 'itemabrev',
                 text: 'Nome Abreviado',
                 sort: true,
                 filter: textFilter({
-                    placeholder: ' ',
-                    delay: 0
+                    placeholder: 'Filtrar...',
+                    delay: 0,
+                    getFilter: filter => (this.filterItemAbrev = filter)
                 })
             },
             {
@@ -48,8 +56,9 @@ class VincularTableItens extends Component {
                 text: 'Item',
                 sort: true,
                 filter: textFilter({
-                    placeholder: ' ',
-                    delay: 0
+                    placeholder: 'Filtrar...',
+                    delay: 0,
+                    getFilter: filter => (this.filterItem = filter)
                 })
             }
         ];
@@ -113,6 +122,19 @@ class VincularTableItens extends Component {
             cpymanut: true,
             cpyaros: true
         });
+
+        if (this.filterReferencia && typeof this.filterReferencia === 'function') {
+            this.filterReferencia('');
+        }
+        if (this.filterItemAbrev && typeof this.filterItemAbrev === 'function') {
+            this.filterItemAbrev('');
+        }
+        if (this.filterItem && typeof this.filterItem === 'function') {
+            this.filterItem('');
+        }
+        if (this.clearSearchBtn) {
+            this.clearSearchBtn.firstChild.click();
+        }
     }
 
     handleOnSelect(row, isSelect, rowIndex, e) {
@@ -222,6 +244,15 @@ class VincularTableItens extends Component {
                                 <div className='vinculartabletools'>
                                     <div style={{ flex: 1 }}>
                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
+                                        <div
+                                            ref={ref => (this.clearSearchBtn = ref)}
+                                            hidden
+                                        >
+                                            <Search.ClearSearchButton
+                                                { ...props.searchProps }
+                                                hidden
+                                            />
+                                        </div>
                                     </div>
                                     <div className='vincularbtnshowselected'>
                                         <div className="form-check">

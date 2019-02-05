@@ -4,7 +4,7 @@ import Axios from 'axios';
 import { toastr } from 'react-redux-toastr';
 import { BASEURL } from '../utils/urls';
 
-import { consultarMarcas, consultarModelos, consultarAnoModelo } from '../utils/fipeApi';
+//import { consultarMarcas, consultarModelos, consultarAnoModelo } from '../utils/fipeApi';
 import { doFetchVehicle } from '../utils/UtilsActions';
 import { store } from '../../index';
 
@@ -22,7 +22,7 @@ export const doOpenVeiculoModal = (
     }
 ) => dispatch => {
     const veiculo = veiculoType || '1';
-    const fipeTabRef = store.getState().CadastroVeiculoReducer.fipeTabRef;
+    //const fipeTabRef = store.getState().CadastroVeiculoReducer.fipeTabRef;
     dispatch({
         type: 'modify_formtype_cadastroveiculo',
         payload: formType
@@ -49,7 +49,7 @@ export const doOpenVeiculoModal = (
         store.dispatch(change('cadastroveiculos', 'combustivel', formValues.combustivel));
     }
 
-    if (fipeTabRef && fipeTabRef.length > 0) {
+    /* if (fipeTabRef && fipeTabRef.length > 0) {
         const funExec = async () => {
             dispatch(change('cadastroveiculos', 'fipeperiodoref', fipeTabRef[0].Codigo));
             const marcas = await consultarMarcas(fipeTabRef[0].Codigo, veiculo);
@@ -80,7 +80,7 @@ export const doOpenVeiculoModal = (
             } else { return }
         }
         funExec();
-    }
+    } */
 };
 
 export const modifyFormValues = (fields) => dispatch => {

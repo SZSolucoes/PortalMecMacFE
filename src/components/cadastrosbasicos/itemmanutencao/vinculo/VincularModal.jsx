@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import LoadingOverlay from 'react-loading-overlay';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import _ from 'lodash';
+import Select from 'react-select';
 import 'react-tabs/style/react-tabs.css';
 
 import './Vincular.css';
@@ -18,6 +19,7 @@ class VincularModal extends React.Component {
         super(props);
 
         this.renderBodyLote = this.renderBodyLote.bind(this);
+        this.onChangeReferencia = this.onChangeReferencia.bind(this);
         this.onClickConfirmLote = this.onClickConfirmLote.bind(this);
         this.onClickFecharLote = this.onClickFecharLote.bind(this);
 
@@ -25,7 +27,9 @@ class VincularModal extends React.Component {
         this.onClickFecharGerenc = this.onClickFecharGerenc.bind(this);
 
         this.state = {
-            itemmanutcombo: 0
+            itemmanutcombo: 0,
+            itemreferencia: '',
+            itemmanutItens: []
         }
     }
 
@@ -43,8 +47,67 @@ class VincularModal extends React.Component {
         const { dataTableItemManutencao } = this.props;
 
         if (this.state.itemmanutcombo === 0 && dataTableItemManutencao.length) {
+            const itens =  _.map(
+                _.orderBy(
+                    this.props.dataTableItemManutencao, ['id'], ['desc']
+                ), 
+                (dt, index) => ({ 
+                    value: dt.id, 
+                    label: dt.itemabrev 
+                })
+            );
+        
             this.setState({
-                itemmanutcombo: dataTableItemManutencao[0].id
+                itemmanutcombo: { 
+                    value: dataTableItemManutencao[0].id, 
+                    label: dataTableItemManutencao[0].itemabrev
+                },
+                itemmanutItens: itens
+            });
+        }
+    }
+
+    onChangeReferencia(value) {
+        if (value) {
+            const newManutCombo =  _.map(
+                _.orderBy(
+                    _.filter(this.props.dataTableItemManutencao,
+                        fti => {
+                            const optionSplited = value.split(';').map(it => it.trim()).filter(fta => fta);
+                            const optionSplitedFti = fti.referencia.split(';').map(itb => itb.trim()).filter(ftb => ftb);
+                            if (typeof fti.referencia === 'string') {
+                                for (let index = 0; index < optionSplitedFti.length; index++) {
+                                    const element = optionSplitedFti[index].toLowerCase();
+                                    
+                                    for (let indexb = 0; indexb < optionSplited.length; indexb++) {
+                                        const elementb = optionSplited[indexb].toLowerCase();
+                                        
+                                        if (element.includes(elementb)) return true;
+                                    }
+                                }
+                            }
+
+                            return false;
+                        }
+                    ), 
+                    ['id'], ['desc']
+                ), 
+                (dt, index) => ({ 
+                    value: dt.id, 
+                    label: dt.itemabrev 
+                })
+            );
+    
+            this.setState({ 
+                itemreferencia: value,
+                itemmanutcombo: newManutCombo[0],
+                itemmanutItens: newManutCombo 
+            });
+        } else {
+            this.setState({ 
+                itemreferencia: '',
+                itemmanutcombo: 0,
+                itemmanutItens: [] 
             });
         }
     }
@@ -78,12 +141,27 @@ class VincularModal extends React.Component {
     }
 
     onClickFecharLote() {
+        this.VincularTableGerencVeicRef.getWrappedInstance().onClickFechar();
         this.VincularTableItensRef.getWrappedInstance().onClickFechar();
         this.VincularTableRef.getWrappedInstance().onClickFechar();
+
+        this.setState({
+            itemmanutcombo: 0,
+            itemreferencia: '',
+            itemmanutItens: []
+        });
     }
 
     onClickFecharGerenc() {
         this.VincularTableGerencVeicRef.getWrappedInstance().onClickFechar();
+        this.VincularTableItensRef.getWrappedInstance().onClickFechar();
+        this.VincularTableRef.getWrappedInstance().onClickFechar();
+
+        this.setState({
+            itemmanutcombo: 0,
+            itemreferencia: '',
+            itemmanutItens: []
+        });
     }
 
     renderBodyLote() {
@@ -159,33 +237,41 @@ class VincularModal extends React.Component {
                                                         className="row col-12 d-flex justify-content-start"
                                                     >
                                                         <div className='form-group col-4'>
-                                                            <label htmlFor='itemmanutcombo'>Item Manutenção</label>
-                                                            <select
-                                                                className="form-control" 
+                                                            <label htmlFor='itemreferencia'>Referência</label>
+                                                            <input
+                                                                name="itemreferencia"
+                                                                className={'form-control'}
+                                                                placeholder={'Filtrar combo por referência...'}
+                                                                multiline={3}
+                                                                value={this.state.itemreferencia}
+                                                                onChange={event => this.onChangeReferencia(event.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className='form-group col-4'>
+                                                            <label htmlFor='itemmanutcombo'>
+                                                                Item Manutenção
+                                                                <b
+                                                                    style={{
+                                                                        marginLeft: 15,
+                                                                        color: '#007BFF'
+                                                                    }}
+                                                                >
+                                                                    {`${this.state.itemmanutItens.length} Itens`}
+                                                                </b>
+                                                            </label>
+                                                            <Select
                                                                 name="itemmanutcombo"
+                                                                placeholder={'Selecionar item...'}
+                                                                multiline={3}
                                                                 value={this.state.itemmanutcombo}
-                                                                onChange={event => 
+                                                                noOptionsMessage={() => 'Não há opções...'}
+                                                                onChange={option => 
                                                                     this.setState({ 
-                                                                        itemmanutcombo: event.target.value 
+                                                                        itemmanutcombo: option 
                                                                     })
                                                                 }
-                                                            >
-                                                                {
-                                                                    _.map(
-                                                                        this.props.dataTableItemManutencao, 
-                                                                        (dt, index) => {
-                                                                            return (
-                                                                                <option 
-                                                                                    key={index} 
-                                                                                    value={dt.id}
-                                                                                >
-                                                                                    {dt.itemabrev}
-                                                                                </option>
-                                                                            );
-                                                                        }
-                                                                    )
-                                                                }
-                                                            </select>
+                                                                options={this.state.itemmanutItens}
+                                                            />
                                                         </div>
                                                         <div
                                                             className='buttonmove'
@@ -197,7 +283,7 @@ class VincularModal extends React.Component {
                                                                     this
                                                                     .VincularTableGerencVeicRef
                                                                     .getWrappedInstance()
-                                                                    .onClickVincItem(this.state.itemmanutcombo)
+                                                                    .onClickVincItem(this.state.itemmanutcombo.value)
                                                                 }}
                                                             >
                                                                 Vincular Item

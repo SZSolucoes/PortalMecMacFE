@@ -55,13 +55,14 @@ class ComplementosTabs extends React.Component {
         const asyncFunExec = async () => {
             const dataTable = await doGetDataTableItemManutencao(this.props.item.id);
             if (dataTable && dataTable.success) {
+                const orderedData = _.orderBy(dataTable.data, ['id'], ['desc']);
                 store.dispatch({
                     type: 'modify_itemmanutencaocombo_manutencao',
-                    payload: dataTable.data
+                    payload: orderedData
                 });
 
-                if (dataTable.data[0] && dataTable.data[0].itemmanutid) {
-                    store.dispatch(change('manutencao', 'iditemmanut', dataTable.data[0].itemmanutid)); 
+                if (orderedData[0] && orderedData[0].itemmanutid) {
+                    store.dispatch(change('manutencao', 'iditemmanut', orderedData[0].itemmanutid)); 
                 }
             }
         }

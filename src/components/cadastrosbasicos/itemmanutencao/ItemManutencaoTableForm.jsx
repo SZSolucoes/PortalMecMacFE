@@ -20,8 +20,9 @@ class ItemManutencaoTableForm extends React.Component {
     onSubmitForm(values) {
         this.props.doPostItem(
             { 
+                referencia: values.referencia,
+                itemabrev: values.itemabrev,
                 item: values.item, 
-                itemabrev: values.itemabrev 
             }, 
             this.buttonFecharRef
         );
@@ -43,7 +44,7 @@ class ItemManutencaoTableForm extends React.Component {
                 <div className="form">
                     <div className="itemmanutencaodivtablebasic">
                         <div className="row">
-                            <div className="col-12 col-md-3">
+                            {/* <div className="col-12 col-md-3">
                                 <div className="form-group">
                                     <label htmlFor="id">ID</label>
                                     <Field 
@@ -54,7 +55,15 @@ class ItemManutencaoTableForm extends React.Component {
                                         disabled
                                     />
                                 </div>
-                            </div>
+                            </div> */}
+                            <Field 
+                                component="input"
+                                type="text"
+                                className="form-control" 
+                                name="id"
+                                disabled
+                                hidden
+                            />
                             <div className="col-12 col-md-4">
                                 <div className="form-group">
                                     <label htmlFor="itemabrev">Nome Abreviado *</label>
@@ -67,7 +76,7 @@ class ItemManutencaoTableForm extends React.Component {
                                     />
                                 </div>
                             </div> 
-                            <div className="col-12 col-md-5">
+                            <div className="col-12 col-md-8">
                                 <div className="form-group">
                                     <label htmlFor="item">Item *</label>
                                     <Field 
@@ -79,6 +88,23 @@ class ItemManutencaoTableForm extends React.Component {
                                     />
                                 </div>
                             </div> 
+                        </div>
+                        <div className="row">
+                            <div className='col-6'>
+                                <div className='form-group'>
+                                    <label htmlFor='referencia'>Referência</label>
+                                    <Field
+                                        component={'textarea'}
+                                        className='form-control'
+                                        name='referencia'
+                                        rows={4}
+                                        placeholder={
+                                            'Valores de referência separados por ponto-e-vírgula.\n\n' +
+                                            'Exemplo: Veiculo01;Veiculo02;Veiculo03;...'
+                                        }
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className="row">
                             <div className="col-12 modal-footer d-flex justify-content-end">
@@ -126,7 +152,8 @@ const mapStateToProps = (state) => ({
     initialValues: {
         id: '',
         item: '',
-        itemabrev: ''
+        itemabrev: '',
+        referencia: ''
     }
 });
 

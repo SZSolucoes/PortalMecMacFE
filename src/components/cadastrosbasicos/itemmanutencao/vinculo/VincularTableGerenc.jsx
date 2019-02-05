@@ -59,7 +59,6 @@ class VincularTableGerenc extends Component {
                 formatter: (cell, row, rowIndex, formatExtraData) => {
                     return `${row.fipemesano.trim()}|${row.marca.trim()}|${row.modelo.trim()}|${row.ano.trim()}`;
                 }
-                
             }, 
             {
                 dataField: 'fipeperiodoref',
@@ -69,7 +68,8 @@ class VincularTableGerenc extends Component {
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterFipePeriodoRef = filter)
                 })
             }, 
             {
@@ -80,7 +80,8 @@ class VincularTableGerenc extends Component {
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterMarca = filter)
                 })
             }, 
             {
@@ -91,7 +92,8 @@ class VincularTableGerenc extends Component {
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterModelo = filter)
                 })
             }, 
             {
@@ -102,7 +104,8 @@ class VincularTableGerenc extends Component {
                 style: { textAlign: 'center' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterAno = filter)
                 })
             }, 
             {
@@ -113,7 +116,8 @@ class VincularTableGerenc extends Component {
                 style: { textAlign: 'left' },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
-                    delay: 0
+                    delay: 0,
+                    getFilter: filter => (this.filterCombustivel = filter)
                 })
             }
         ];
@@ -124,18 +128,26 @@ class VincularTableGerenc extends Component {
                 text: 'ID',
                 sort: true,
                 csvExport: false,
-                filter: textFilter({
-                    placeholder: ' ',
-                    delay: 0
-                })
+                hidden: true
             }, 
+            {
+                dataField: 'referencia',
+                text: 'Referência',
+                sort: true,
+                filter: textFilter({
+                    placeholder: 'Filtrar...',
+                    delay: 0,
+                    getFilter: filter => (this.filterReferencia = filter)
+                })
+            },
             {
                 dataField: 'itemabrev',
                 text: 'Nome Abreviado',
                 sort: true,
                 filter: textFilter({
-                    placeholder: ' ',
-                    delay: 0
+                    placeholder: 'Filtrar...',
+                    delay: 0,
+                    getFilter: filter => (this.filterItemAbrev = filter)
                 })
             },
             {
@@ -143,8 +155,9 @@ class VincularTableGerenc extends Component {
                 text: 'Item',
                 sort: true,
                 filter: textFilter({
-                    placeholder: ' ',
-                    delay: 0
+                    placeholder: 'Filtrar...',
+                    delay: 0,
+                    getFilter: filter => (this.filterItem= filter)
                 })
             }
         ];
@@ -214,6 +227,39 @@ class VincularTableGerenc extends Component {
             itensLoading: false,
             dataTableItemManutencao: []
         });
+
+        if (this.filterFipePeriodoRef && typeof this.filterFipePeriodoRef === 'function') {
+            this.filterFipePeriodoRef('');
+        }
+        if (this.filterMarca && typeof this.filterMarca === 'function') {
+            this.filterMarca('');
+        }
+        if (this.filterModelo && typeof this.filterModelo === 'function') {
+            this.filterModelo('');
+        }
+        if (this.filterAno && typeof this.filterAno === 'function') {
+            this.filterAno('');
+        }
+        if (this.filterCombustivel && typeof this.filterCombustivel === 'function') {
+            this.filterCombustivel('');
+        }
+        if (this.clearSearchBtnVeic) {
+            this.clearSearchBtnVeic.firstChild.click();
+        }
+
+        if (this.filterReferencia && typeof this.filterReferencia === 'function') {
+            this.filterReferencia('');
+        }
+        if (this.filterItemAbrev && typeof this.filterItemAbrev === 'function') {
+            this.filterItemAbrev('');
+        }
+        if (this.filterItem && typeof this.filterItem === 'function') {
+            this.filterItem('');
+        }
+        if (this.clearSearchBtnItens) {
+            this.clearSearchBtnItens.firstChild.click();
+        }
+        
     }
 
     onClickVincItem(itemcombo) {
@@ -403,6 +449,15 @@ class VincularTableGerenc extends Component {
                                 <div className='vinculartabletools'>
                                     <div style={{ flex: 1 }}>
                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
+                                        <div
+                                            ref={ref => (this.clearSearchBtnVeic = ref)}
+                                            hidden
+                                        >
+                                            <Search.ClearSearchButton
+                                                { ...props.searchProps }
+                                                hidden
+                                            />
+                                        </div>
                                     </div>
                                     <div className='vincularbtnshowselected' />
                                 </div>
@@ -475,6 +530,15 @@ class VincularTableGerenc extends Component {
                                     </button>
                                     <div style={{ flex: 1, marginTop: 5 }}>
                                         <Search.SearchBar { ...props.searchProps } placeholder="Buscar..."/>
+                                        <div
+                                            ref={ref => (this.clearSearchBtnItens = ref)}
+                                            hidden
+                                        >
+                                            <Search.ClearSearchButton
+                                                { ...props.searchProps }
+                                                hidden
+                                            />
+                                        </div>
                                     </div>
                                     <div className='vincularbtnshowselected mt-1'>
                                         <div className="form-check">

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import LoadingOverlay from 'react-loading-overlay';
 
 import scrollToComponent from 'react-scroll-to-component';
-import CadastroCarroForm from './CadastroVeiculoForm';
+import CadastroVeiculoForm from './CadastroVeiculoForm';
 import './CadastroVeiculoStyle.css';
 
 class CadastroVeiculo extends Component {
@@ -79,7 +79,7 @@ class CadastroVeiculo extends Component {
                                 <div className="modal-body">
                                     <React.Fragment>
                                         <div className="p-3 mt-3">
-                                            <CadastroCarroForm />
+                                            <CadastroVeiculoForm />
                                         </div>
                                     </React.Fragment>
                                 </div>
