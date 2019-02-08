@@ -256,7 +256,12 @@ class VincularModal extends React.Component {
                                                                         color: '#007BFF'
                                                                     }}
                                                                 >
-                                                                    {`${this.state.itemmanutItens.length} Itens`}
+                                                                    {
+                                                                        this.state.itemmanutItens.length === 1 ?
+                                                                        `${this.state.itemmanutItens.length} Item`
+                                                                        :
+                                                                        `${this.state.itemmanutItens.length} Itens`
+                                                                    }
                                                                 </b>
                                                             </label>
                                                             <Select

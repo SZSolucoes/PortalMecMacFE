@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux';
 import { Field, reduxForm, change } from 'redux-form';
+import { createNumberMask } from 'redux-form-input-masks';
 import RadioGroup from '../../../utils/RadioGroup';
 
 import { store } from '../../../../index';
@@ -63,9 +64,6 @@ class ManutMdfItemForm extends React.Component {
     } 
 
     render() {
-        const FldValue = this.props.item.marca || '';
-        const anoFldValue = this.props.item.ano || '';
-
         const { handleSubmit, pristine, reset, submitting } = this.props;
 
         return (
@@ -79,7 +77,6 @@ class ManutMdfItemForm extends React.Component {
                                 className='form-control' 
                                 name='itemabrev'
                                 disabled={true}
-                                value={FldValue}
                             />
                         </div>
                     </div>
@@ -91,7 +88,6 @@ class ManutMdfItemForm extends React.Component {
                                 className='form-control' 
                                 name='itemmanut'
                                 disabled={true}
-                                value={FldValue}
                                 rows={4}
                             />
                         </div>
@@ -105,28 +101,32 @@ class ManutMdfItemForm extends React.Component {
                                 component={this.renderField}
                                 className='form-control' 
                                 name='mes'
-                                value={FldValue}
                             />
                         </div>
                     </div>
                     <div className='col-12 col-sm-12 col-xl-4'>
                         <div className='form-group'>
-                            <label htmlFor='milhas'>Mi x 1000</label>
+                            <label htmlFor='milhas'>Milhas</label>
                             <Field
                                 component={this.renderField} 
                                 className='form-control' 
                                 name='milhas'
+                                {...createNumberMask({
+                                    locale: 'pt-BR',
+                                })}
                             />
                         </div>
                     </div>
                     <div className='col-12 col-sm-12 col-xl-4'>
                         <div className='form-group'>
-                            <label htmlFor='km'>Km x 1000</label>
+                            <label htmlFor='km'>Km</label>
                             <Field
                                 component={this.renderField} 
                                 className='form-control' 
                                 name='km'
-                                value={anoFldValue}
+                                {...createNumberMask({
+                                    locale: 'pt-BR',
+                                })}
                             />
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux';
-import { Field, reduxForm, getFormValues, change, reset } from 'redux-form'
+import { Field, reduxForm, change, reset } from 'redux-form'
 import { createNumberMask } from 'redux-form-input-masks';
 import { withRouter } from 'react-router-dom';
 import Select from 'react-select';

@@ -175,10 +175,13 @@ class ManutencaoTable extends Component {
             }, 
             {
                 dataField: 'milhas',
-                text: 'Mi x 1000',
+                text: 'Milhas',
                 sort: true,
                 headerStyle: { textAlign: 'center' },
                 style: { textAlign: 'center' },
+                formatter: (cell, row, rowIndex, formatExtraData) => {
+                    return cell ? cell.toLocaleString() : '0';
+                },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
                     delay: 0
@@ -186,10 +189,13 @@ class ManutencaoTable extends Component {
             }, 
             {
                 dataField: 'quilometros',
-                text: 'Km x 1000',
+                text: 'Km',
                 sort: true,
                 headerStyle: { textAlign: 'center' },
                 style: { textAlign: 'center' },
+                formatter: (cell, row, rowIndex, formatExtraData) => {
+                    return cell ? cell.toLocaleString() : '0';
+                },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
                     delay: 0

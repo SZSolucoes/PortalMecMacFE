@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux';
 import { Field, reduxForm, getFormValues } from 'redux-form';
+import { createNumberMask } from 'redux-form-input-masks';
 import _ from 'lodash';
 import Select from 'react-select';
 import Main from '../../templates/Main';
@@ -33,8 +34,8 @@ class Manutencao extends React.Component {
                 {
                     key: 0,
                     mes: '',
-                    milhas: '',
-                    quilometros: ''
+                    milhas: 0,
+                    quilometros: 0
                 }
             ],
             itemmanutcombo: 0
@@ -90,7 +91,7 @@ class Manutencao extends React.Component {
                 }
 
                 let newLote = _.filter(
-                    this.state.loterows, lt => lt.mes.trim() || lt.milhas.trim() || lt.quilometros.trim()
+                    this.state.loterows, lt => lt.mes.trim() || lt.milhas || lt.quilometros
                 );
 
                 if (newLote.length) {
@@ -113,8 +114,8 @@ class Manutencao extends React.Component {
                             {
                                 key: 0,
                                 mes: '',
-                                milhas: '',
-                                quilometros: ''
+                                milhas: 0,
+                                quilometros: 0
                             }
                         ]})
                     );
@@ -181,21 +182,27 @@ class Manutencao extends React.Component {
                     </div>
                     <div className='col-12 col-sm-12 col-xl-4'>
                         <div className='form-group'>
-                            <label htmlFor='milhas'>Mi x 1000</label>
+                            <label htmlFor='milhas'>Milhas</label>
                             <Field
                                 component={this.renderField} 
                                 className='form-control' 
                                 name='milhas'
+                                {...createNumberMask({
+                                    locale: 'pt-BR',
+                                })}
                             />
                         </div>
                     </div>
                     <div className='col-12 col-sm-12 col-xl-4'>
                         <div className='form-group'>
-                            <label htmlFor='km'>Km x 1000</label>
+                            <label htmlFor='km'>Km</label>
                             <Field
                                 component={this.renderField} 
                                 className='form-control' 
                                 name='km'
+                                {...createNumberMask({
+                                    locale: 'pt-BR',
+                                })}
                             />
                         </div>
                     </div>
@@ -263,11 +270,28 @@ class Manutencao extends React.Component {
                         <div className='form-group'>
                             <input
                                 className='form-control'
-                                value={row.milhas}
+                                value={row.milhas.toLocaleString()}
                                 onChange={e => {
                                     const newLote = [...this.state.loterows];
-                                    newLote[index].milhas = e.target.value;
-                                    this.setState({ loterows: newLote });
+                                    const nv = e.target.value;
+                                    const tipoStr = typeof nv === 'string';
+                                    let pars = 0;
+
+                                    if (tipoStr) {
+                                        pars = nv.replace(/\./g, '');
+                                        if (!pars) {
+                                            pars = 0
+                                        }
+                                    } 
+
+                                    const value = parseInt(pars, 10);
+
+                                    if (!isNaN(value)) {
+                                        const num = value
+
+                                        newLote[index].milhas = num;
+                                        this.setState({ loterows: newLote });
+                                    }
                                 }}
                             />
                         </div>
@@ -276,11 +300,28 @@ class Manutencao extends React.Component {
                         <div className='form-group'>
                             <input
                                 className='form-control'
-                                value={row.quilometros}
+                                value={row.quilometros.toLocaleString()}
                                 onChange={e => {
                                     const newLote = [...this.state.loterows];
-                                    newLote[index].quilometros = e.target.value;
-                                    this.setState({ loterows: newLote });
+                                    const nv = e.target.value;
+                                    const tipoStr = typeof nv === 'string';
+                                    let pars = 0;
+
+                                    if (tipoStr) {
+                                        pars = nv.replace(/\./g, '');
+                                        if (!pars) {
+                                            pars = 0
+                                        }
+                                    } 
+                                    
+                                    const value = parseInt(pars, 10);
+
+                                    if (!isNaN(value)) {
+                                        const num = value
+
+                                        newLote[index].quilometros = num;
+                                        this.setState({ loterows: newLote });
+                                    }
                                 }}
                             />
                         </div>
@@ -326,12 +367,12 @@ class Manutencao extends React.Component {
                     </div>
                     <div className='col-3 col-sm-3 col-xl-3'>
                         <div className='form-group'>
-                            <label htmlFor='milhas'>Mi x 1000</label>
+                            <label htmlFor='milhas'>Milhas</label>
                         </div>
                     </div>
                     <div className='col-3 col-sm-3 col-xl-3'>
                         <div className='form-group'>
-                            <label htmlFor='km'>Km x 1000</label>
+                            <label htmlFor='km'>Km</label>
                         </div>
                     </div>
                 </div>
@@ -360,8 +401,8 @@ class Manutencao extends React.Component {
                                     {
                                         key: this.state.loterows.length,
                                         mes: '',
-                                        milhas: '',
-                                        quilometros: ''
+                                        milhas: 0,
+                                        quilometros: 0
                                     }
                                 ]
                             })}
@@ -396,8 +437,8 @@ class Manutencao extends React.Component {
                                     {
                                         key: 0,
                                         mes: '',
-                                        milhas: '',
-                                        quilometros: ''
+                                        milhas: 0,
+                                        quilometros: 0
                                     }
                                 ]
                             })}
@@ -531,8 +572,8 @@ const mapStateToProps = (state) => ({
     initialValues: {
         iditemmanut: '',
         mes: '',
-        milhas: '',
-        km: '',
+        milhas: 0,
+        km: 0,
         manutencao: 'vistoria'
     }
 });
