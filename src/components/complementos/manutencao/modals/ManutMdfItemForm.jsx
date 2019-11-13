@@ -142,6 +142,7 @@ class ManutMdfItemForm extends React.Component {
                                 options={[
                                     { title: 'Vistoria', value: 'vistoria' },
                                     { title: 'Substituição', value: 'substituicao' },
+                                    { title: 'Vistoria e/ou Substituição', value: 'vistoriaeousubstituicao' },
                                     { title: 'Nenhum', value: 'nenhum' },
                                 ]} 
                             />

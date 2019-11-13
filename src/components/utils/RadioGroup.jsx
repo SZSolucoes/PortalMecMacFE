@@ -6,7 +6,7 @@ export default class RadioGroup extends React.Component {
         const hasError = meta.touched && meta.error;
 
         return (
-            <div>
+            <div className='form-control pt-3'>
                 {options.map(
                     o =>
                     <div key={o.value}>

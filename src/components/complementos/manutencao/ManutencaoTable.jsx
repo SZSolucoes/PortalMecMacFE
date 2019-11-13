@@ -12,6 +12,7 @@ import ToolkitProvider, { CSVExport, Search } from 'react-bootstrap-table2-toolk
 import { modifyModalTitle, modifyModalMessage, modifyExtraData } from '../../utils/UtilsActions';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css"
 import { store } from '../../..';
+import { TIPOMANUT } from '../../utils/constants';
 
 class ManutencaoTable extends Component {
     constructor(props) {
@@ -185,7 +186,10 @@ class ManutencaoTable extends Component {
                 filter: textFilter({
                     placeholder: 'Filtrar...',
                     delay: 0
-                })
+                }),
+                filterValue: (cell, row) => {
+                    return cell ? cell.toLocaleString() : '0';
+                }
             }, 
             {
                 dataField: 'quilometros',
@@ -199,7 +203,10 @@ class ManutencaoTable extends Component {
                 filter: textFilter({
                     placeholder: 'Filtrar...',
                     delay: 0
-                })
+                }),
+                filterValue: (cell, row) => {
+                    return cell ? cell.toLocaleString() : '0';
+                }
             }, 
             {
                 dataField: 'tipomanut',
@@ -207,10 +214,16 @@ class ManutencaoTable extends Component {
                 sort: true,
                 headerStyle: { textAlign: 'left' },
                 style: { textAlign: 'left' },
+                formatter: (cell, row, rowIndex, formatExtraData) => {
+                    return cell ? TIPOMANUT[cell] : '';
+                },
                 filter: textFilter({
                     placeholder: 'Filtrar...',
                     delay: 0
-                })
+                }),
+                filterValue: (cell, row) => {
+                    return cell ? TIPOMANUT[cell] : '';
+                }
             }
         ];
         return (

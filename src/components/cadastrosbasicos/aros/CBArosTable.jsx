@@ -439,7 +439,17 @@ class CBArosTable extends Component {
                 filter: textFilter({
                     placeholder: 'Filtrar...',
                     delay: 0
-                })
+                }),
+                filterValue: (cell, row) => {
+                    if (cell && cell === '1') {
+                        return 'Carro';
+                    } else if (cell && cell === '2') {
+                        return 'Moto';
+                    } else if (cell && cell === '3') {
+                        return 'Caminhão';
+                    }
+                    return '';
+                }
             },
             {
                 dataField: 'aro',

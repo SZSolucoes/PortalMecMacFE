@@ -16,7 +16,6 @@ import { doPostManutencao, doPostManutencaoLote, doPutVehicleComp } from './Manu
 import './Manutencao.css';
 
 class Manutencao extends React.Component {
-    
     constructor(props) {
         super(props);
 
@@ -218,6 +217,7 @@ class Manutencao extends React.Component {
                                 options={[
                                     { title: 'Vistoria', value: 'vistoria' },
                                     { title: 'Substituição', value: 'substituicao' },
+                                    { title: 'Vistoria e/ou Substituição', value: 'vistoriaeousubstituicao' },
                                     { title: 'Nenhum', value: 'nenhum' },
                                 ]} 
                             />
@@ -342,6 +342,7 @@ class Manutencao extends React.Component {
                                 options={[
                                     { title: 'Vistoria', value: 'vistoria' },
                                     { title: 'Substituição', value: 'substituicao' },
+                                    { title: 'Vistoria e/ou Substituição', value: 'vistoriaeousubstituicao' },
                                     { title: 'Nenhum', value: 'nenhum' },
                                 ]} 
                             />

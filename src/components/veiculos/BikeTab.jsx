@@ -218,7 +218,10 @@ class BikeTab extends React.Component {
                 filter: textFilter({
                     placeholder: 'Filtrar...',
                     delay: 0
-                })
+                }),
+                filterValue: (cell, row) => {
+                    return cell ? `R$ ${cell.toLocaleString(undefined , { minimumFractionDigits: 2 })}` : '';
+                }
             },
             {
                 dataField: 'combustivel',
