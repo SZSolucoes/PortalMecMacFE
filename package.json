@@ -9,7 +9,7 @@
     "axios": "^0.18.0",
     "babel-runtime": "^6.26.0",
     "font-awesome": "^4.7.0",
-    "papaparse": "^4.6.2",
+    "papaparse": "^5.2.0",
     "react": "^16.6.3",
     "react-bootstrap-table-next": "^1.4.1",
     "react-bootstrap-table2-filter": "^1.1.0",
